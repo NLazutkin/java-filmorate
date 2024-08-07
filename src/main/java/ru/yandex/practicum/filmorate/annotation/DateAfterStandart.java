@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidateDateAfterStandart.class)
 public @interface DateAfterStandart {
-    String message() default "Вводимая дата не может быть раньше эталонной";
+    String message() default "Дата не может быть раньше {standartDate}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
     String standartDate() default "1895-12-28";
