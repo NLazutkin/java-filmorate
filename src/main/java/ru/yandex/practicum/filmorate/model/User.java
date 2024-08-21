@@ -6,13 +6,13 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
-@Slf4j
 public class User {
     Long id;
     @NotBlank(message = "E-mail должен быть указан")
@@ -24,4 +24,5 @@ public class User {
     String name;
     @PastOrPresent(message = "Дата рождения не может быть больше текущего дня")
     LocalDate birthday;
+    Set<Long> friends = new HashSet<>();
 }
