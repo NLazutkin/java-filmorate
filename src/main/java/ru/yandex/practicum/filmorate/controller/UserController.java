@@ -16,19 +16,20 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final String userFriendsPath = "/{id}/friends/{friend-id}";
 
     @GetMapping("/{id}")
     public User findUser(@PathVariable("id") Long userId) {
         return userService.findUser(userId);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
+    @PutMapping(userFriendsPath)
+    public void addFriend(@PathVariable("id") Long userId, @PathVariable("friend-id") Long friendId) {
         userService.addFriend(userId, friendId);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
+    @DeleteMapping(userFriendsPath)
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("friend-id") Long friendId) {
         userService.deleteFriend(userId, friendId);
     }
 
@@ -37,8 +38,8 @@ public class UserController {
         return userService.findFriends(userId);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public Collection<User> findOther(@PathVariable("id") Long userId, @PathVariable("otherId") Long otherId) {
+    @GetMapping("/{id}/friends/common/{other-id}")
+    public Collection<User> findOther(@PathVariable("id") Long userId, @PathVariable("other-id") Long otherId) {
         return userService.findOther(userId, otherId);
     }
 

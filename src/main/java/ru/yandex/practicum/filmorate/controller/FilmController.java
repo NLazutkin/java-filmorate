@@ -16,14 +16,15 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmController {
     private final FilmService filmService;
+    private final String filmLikePath = "/{id}/like/{user-id}";
 
-    @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
+    @PutMapping(filmLikePath)
+    public void addLike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
         filmService.addLike(filmId, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("userId") Long friendId) {
+    @DeleteMapping(filmLikePath)
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("user-id") Long friendId) {
         filmService.deleteLike(userId, friendId);
     }
 
