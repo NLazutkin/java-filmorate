@@ -5,14 +5,14 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.annotation.DateAfterStandart;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
-@Slf4j
 public class Film {
     Long id;
     @NotBlank(message = "Название фильма не должно быть пустым")
@@ -23,4 +23,5 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Продолжительность фильма не может быть отрицательным числом")
     Long duration;
+    private final Set<Long> likes = new HashSet<>();
 }

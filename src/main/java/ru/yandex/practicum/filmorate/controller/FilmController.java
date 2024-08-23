@@ -1,64 +1,51 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
-    private final Map<Long, Film> films = new HashMap<>();
-    private final LocalDate cinemaBirthDay = LocalDate.of(1895, 12, 28);
+    private final FilmService filmService;
+    private final String filmLikePath = "/{id}/like/{user-id}";
 
-    // вспомогательный метод для генерации идентификатора нового поста
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @PutMapping(filmLikePath)
+    public void addLike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
+        filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping(filmLikePath)
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("user-id") Long friendId) {
+        filmService.deleteLike(userId, friendId);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> findPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
+        return filmService.findPopular(count);
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        return films.values();
+        return filmService.findAll();
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film create(@Valid @RequestBody Film film) {
-        log.info("Создаем запись о фильме");
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        log.trace("Фильм \n" + film + "\n сохранен!");
-        return film;
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        log.info("Обновляем данные фильма");
-
-        if (newFilm.getId() == null) {
-            log.error("Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
-        }
-
-        if (films.containsKey(newFilm.getId())) {
-            films.put(newFilm.getId(), newFilm);
-            log.trace("Фильм \n" + newFilm + "\n обновлен!");
-            return newFilm;
-        }
-
-        log.error("Фильм с id = " + newFilm.getId() + " под названием \"" + newFilm.getName() + "\" не найден");
-        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " под названием \"" + newFilm.getName() + "\" не найден");
+        return filmService.update(newFilm);
     }
 }
