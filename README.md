@@ -50,6 +50,12 @@ INSERT INTO Friends (user_id, friend_id, status_id)
 VALUE ({userId}, {friend_id}, 2);
 ```
 
+```sql
+INSERT INTO Friends (user_id, friend_id, status_id)
+SELECT {userId}, {friend_id}, s.name FROM status AS s
+WHERE s.name = 'not acepted';
+```
+
 ### 3. Удалить друга
 
 #### deleteFriend(Long userId, Long friendId)
@@ -150,8 +156,8 @@ JOIN Rating AS r ON f.rating_id = r.rating_id;
 JOIN (SELECT fu.film_id AS liked_film_id,
              COUNT(fu.user_id) AS likes
       FROM Film_User AS fu
-      GROUP BY fu.film_id
-      ORDER BY likes DESC) AS liked_films ON f.id = liked_films.liked_film_id
+      GROUP BY fu.film_id) AS liked_films ON f.id = liked_films.liked_film_id
+ORDER BY liked_films.likes DESC
 LIMIT {count};
 ```
 
