@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.ErrorResponse;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -45,6 +42,13 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleInternalServerException(final InternalServerException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
     // Для валидации через jakarta.validation.constraints
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -56,6 +60,20 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validationMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleGenreNotFoundException(final GenreNotFoundException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMpaNotFoundException(final MpaNotFoundException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }

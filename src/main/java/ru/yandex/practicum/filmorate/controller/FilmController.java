@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -29,23 +31,33 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
+    public Collection<FilmDto> findPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
         return filmService.findPopular(count);
     }
 
+    @GetMapping("/{id}")
+    public FilmDto findFilm(@PathVariable("id") Long filmId) {
+        return filmService.findFilm(filmId);
+    }
+
     @GetMapping
-    public Collection<Film> findAll() {
+    public Collection<FilmDto> findAll() {
         return filmService.findAll();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@Valid @RequestBody Film film) {
+    public FilmDto create(@Valid @RequestBody NewFilmRequest film) {
         return filmService.create(film);
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film newFilm) {
+    public FilmDto update(@Valid @RequestBody UpdateFilmRequest newFilm) {
         return filmService.update(newFilm);
+    }
+
+    @DeleteMapping("/{id}")
+    public boolean delete(@PathVariable("id") Long filmId) {
+        return filmService.delete(filmId);
     }
 }

@@ -1,19 +1,16 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.user;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-@EqualsAndHashCode(of = {"id"})
-public class User {
+public class UpdateUserRequest {
     private Long id;
     @NotBlank(message = "E-mail должен быть указан")
     @Email(message = "Email должен быть в формате user@yandex.ru")
@@ -24,5 +21,12 @@ public class User {
     private String name;
     @PastOrPresent(message = "Дата рождения не может быть больше текущего дня")
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+
+    public boolean hasName() {
+        return !StringUtils.isBlank(this.name);
+    }
+
+    public boolean hasBirthday() {
+        return this.birthday != null;
+    }
 }
