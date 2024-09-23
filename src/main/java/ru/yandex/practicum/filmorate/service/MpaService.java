@@ -24,7 +24,7 @@ public class MpaService {
     private final MpaStorage mpaStorage;
 
     @Autowired
-    public MpaService(@Qualifier(/*"MpaDbStorage"*/"InMemoryMpaStorage") MpaStorage mpaStorage) {
+    public MpaService(@Qualifier(/*"InMemoryMpaStorage"*/"MpaDbStorage") MpaStorage mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
 

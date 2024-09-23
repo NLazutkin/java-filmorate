@@ -11,20 +11,19 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilmMapper {
 
-    public static FilmDto mapToFilmDto(Film film, Set<Genre> genres, Mpa mpa) {
+    public static FilmDto mapToFilmDto(Film film, Mpa mpa, LinkedHashSet<Genre> genres, LinkedHashSet<Long> likes) {
         FilmDto dto = new FilmDto();
         dto.setId(film.getId());
         dto.setName(film.getName());
         dto.setDescription(film.getDescription());
         dto.setReleaseDate(film.getReleaseDate());
         dto.setDuration(film.getDuration());
-        dto.setLikes(film.getLikes());
-        dto.setGenres((LinkedHashSet<Genre>) genres);
+        dto.setLikes(likes);
+        dto.setGenres(genres);
         dto.setMpa(MpaMapper.mapToMpaDto(mpa));
 
         return dto;

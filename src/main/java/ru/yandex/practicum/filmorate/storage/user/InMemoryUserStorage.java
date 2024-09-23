@@ -49,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         user.getFriends().add(friendId);
 
-        return new Pair<>(friend.getName(), user.getName());
+        return new Pair<>(user.getName(), friend.getName());
     }
 
     public Pair<String, String> deleteFriend(Long userId, Long friendId) {
@@ -58,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         user.getFriends().remove(friendId);
 
-        return new Pair<>(friend.getName(), user.getName());
+        return new Pair<>(user.getName(), friend.getName());
     }
 
     public User create(User user) {

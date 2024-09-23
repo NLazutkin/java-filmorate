@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.Collection;
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
     protected final RowMapper<Genre> baseMapper;
 
+    @Autowired
     public GenreDbStorage(JdbcTemplate jdbc, GenreBaseRowMapper baseMapper) {
         super(jdbc);
         this.baseMapper = baseMapper;
@@ -54,7 +56,8 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
 
     @Override
     public Genre update(Genre newMpa) {
-        update(GenreQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные о жанре", newMpa.getName());
+        update(GenreQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные о жанре",
+                newMpa.getName(), newMpa.getId());
         return newMpa;
     }
 

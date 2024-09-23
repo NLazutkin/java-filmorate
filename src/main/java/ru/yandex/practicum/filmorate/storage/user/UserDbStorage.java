@@ -32,6 +32,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         return findOne(UserQueries.FIND_BY_ID_QUERY.toString(), baseMapper, userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
+    @Override
     public boolean isUserWithEmailExist(String eMail) {
         return findOne(UserQueries.FIND_BY_EMAIL_QUERY.toString(), baseMapper, eMail).isPresent();
     }
@@ -62,7 +63,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
         update(UserQueries.INSERT_FRIEND_QUERY.toString(), errMsg, userId, friendId, 1);
 
-        return new Pair<>(friend.getName(), user.getName());
+        return new Pair<>(user.getName(), friend.getName());
     }
 
     @Override
@@ -72,7 +73,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
         delete(UserQueries.DELETE_FRIEND_QUERY.toString(), userId, friendId);
 
-        return new Pair<>(friend.getName(), user.getName());
+        return new Pair<>(user.getName(), friend.getName());
     }
 
     @Override

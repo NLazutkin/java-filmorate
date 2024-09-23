@@ -19,6 +19,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,10 +31,10 @@ public class FilmService {
     private final GenreStorage genreStorage;
 
     @Autowired
-    public FilmService(@Qualifier(/*"FilmDbStorage"*/"InMemoryFilmStorage") FilmStorage filmStorage,
-                       @Qualifier(/*"UserDbStorage"*/"InMemoryUserStorage") UserStorage userStorage,
-                       @Qualifier(/*"MpaDbStorage"*/"InMemoryMpaStorage") MpaStorage mpaStorage,
-                       @Qualifier(/*"GenreDbStorage"*/"InMemoryGenreStorage") GenreStorage genreStorage) {
+    public FilmService(@Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
+                       @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
+                       @Qualifier("MpaDbStorage"/*"InMemoryMpaStorage"*/) MpaStorage mpaStorage,
+                       @Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
@@ -41,9 +42,23 @@ public class FilmService {
     }
 
     public FilmDto findFilm(Long filmId) {
-        return FilmMapper.mapToFilmDto(filmStorage.findFilm(filmId),
-                filmStorage.findGenresById(filmId),
-                filmStorage.findRatingById(filmId));
+        log.debug("Поиск фильма с ID " + filmId);
+
+        Film film = filmStorage.findFilm(filmId);
+
+        log.debug("Ищем жанры фильма " + film.getName());
+        LinkedHashSet<Genre> genres = filmStorage.findGenresIds(filmId).stream()
+                .map(genreStorage::findGenre)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        log.debug("Ищем лайки фильма " + film.getName());
+        LinkedHashSet<Long> likes = filmStorage.getLikes(film);
+
+        log.debug("Ищем рейтинг фильма " + film.getName());
+        Mpa mpa = mpaStorage.findMpa(filmStorage.findRatingId(filmId));
+
+        log.debug("Фильм " + film.getName() + " найден!");
+        return FilmMapper.mapToFilmDto(film, mpa, genres, likes);
     }
 
     public void addLike(Long filmId, Long userId) {
@@ -95,7 +110,7 @@ public class FilmService {
 
         Collection<Genre> genres = film.getGenres().stream()
                 .map(genreStorage::findGenre)
-                .peek(genre -> filmStorage.addGenre(genre, createdfilm))
+                .peek(genre -> filmStorage.addGenreId(genre, createdfilm))
                 .toList();
 
         log.trace("Фильм " + createdfilm.getName() + " сохранен!");

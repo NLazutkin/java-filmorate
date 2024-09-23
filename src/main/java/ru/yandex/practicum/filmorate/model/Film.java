@@ -8,9 +8,7 @@ import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.annotation.DateAfterStandart;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -24,7 +22,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Продолжительность фильма не может быть отрицательным числом")
     private Long duration;
-    private Set<Long> likes = new HashSet<>();
+    private LinkedHashSet<Long> likes = new LinkedHashSet<>();
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     private Mpa mpa;
 }

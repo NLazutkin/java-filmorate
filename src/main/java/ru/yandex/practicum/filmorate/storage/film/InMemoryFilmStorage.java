@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 @Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private final Map<Long, LinkedHashSet<Genre>> filmsGenres = new HashMap<>(); //???
-    // ratings
+    private final Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
+    private final Map<Long, Long> filmsMpaId = new HashMap<>();
 
     // вспомогательный метод для генерации идентификатора нового поста
     private long getNextId() {
@@ -59,6 +58,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.getLikes().add(user.getId());
     }
 
+    public LinkedHashSet<Long> getLikes(Film film) {
+        LinkedHashSet<Long> likes = film.getLikes();
+
+        if (likes == null || likes.isEmpty()) {
+            log.trace("У фильма " + film.getName() + " нет лайков");
+            return new LinkedHashSet<>();
+        }
+
+        return likes;
+    }
+
     @Override
     public void deleteLike(Film film, User user) {
         if (!film.getLikes().contains(user.getId())) {
@@ -70,40 +80,44 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addGenre(Genre genre, Film film) {
-        Optional<LinkedHashSet<Genre>> filmGenre = Optional.ofNullable(filmsGenres.get(film.getId()));
-        LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-        if (filmGenre.isPresent()) {
-            genres = filmGenre.get();
+    public void addGenreId(Genre genre, Film film) {
+        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(film.getId()));
+        LinkedHashSet<Long> genresIds = new LinkedHashSet<>();
+        if (filmGenresIds.isPresent()) {
+            genresIds = filmGenresIds.get();
         }
-        genres.add(genre);
-        filmsGenres.put(film.getId(), genres);
+        genresIds.add(genre.getId());
+        filmsGenresIds.put(film.getId(), genresIds);
     }
 
     @Override
-    public Set<Genre> findGenresById(Long filmId) {
-        LinkedHashSet<Genre> genres = filmsGenres.get(filmId);
-        if (genres.isEmpty()) {
+    public LinkedHashSet<Long> findGenresIds(Long filmId) {
+        LinkedHashSet<Long> genresIds = filmsGenresIds.get(filmId);
+        if (genresIds == null || genresIds.isEmpty()) {
             return new LinkedHashSet<>();
         }
-        return genres;
+        return genresIds;
     }
 
-    @Override //???
-    public Mpa findRatingById(Long filmId) {
-        return new Mpa();
+    @Override
+    public Long findRatingId(Long filmId) {
+        return Optional.ofNullable(filmsMpaId.get(filmId))
+                .orElseThrow(() -> new NotFoundException("Рейтинг для фильма с ID " + filmId + " не найден"));
     }
 
     @Override
     public Film create(Film film) {
         film.setId(getNextId());
         films.put(film.getId(), film);
+
+        filmsMpaId.put(film.getId(), film.getMpa().getId());
         return film;
     }
 
     @Override
     public Film update(Film newFilm) {
         films.put(newFilm.getId(), newFilm);
+        filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
         log.trace("Данные о фильме " + newFilm.getName() + " обновлены!");
         return newFilm;
     }

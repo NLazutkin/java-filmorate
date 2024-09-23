@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.util.Collection;
 
 public interface MpaStorage {
-    Mpa findMpa(Long userId);
+    Mpa findMpa(Long mpaId);
 
     Mpa findMpa(Mpa mpa);
 

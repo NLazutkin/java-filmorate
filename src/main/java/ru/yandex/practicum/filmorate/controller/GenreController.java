@@ -21,7 +21,7 @@ public class GenreController {
     private final String genrePath = "/{id}";
 
     @GetMapping(genrePath)
-    public GenreDto findMpa(@PathVariable("id") Long genreId) {
+    public GenreDto findGenre(@PathVariable("id") Long genreId) {
         return genreService.findGenre(genreId);
     }
 

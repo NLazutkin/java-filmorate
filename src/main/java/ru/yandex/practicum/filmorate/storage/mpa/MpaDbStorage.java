@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.Collection;
 public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
     protected final RowMapper<Mpa> baseMapper;
 
+    @Autowired
     public MpaDbStorage(JdbcTemplate jdbc, MpaBaseRowMapper baseMapper) {
         super(jdbc);
         this.baseMapper = baseMapper;
@@ -55,7 +57,7 @@ public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
     @Override
     public Mpa update(Mpa newMpa) {
         update(MpaQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные о рейтинге MPA",
-                newMpa.getName(), newMpa.getDescription());
+                newMpa.getName(), newMpa.getDescription(), newMpa.getId());
         return newMpa;
     }
 

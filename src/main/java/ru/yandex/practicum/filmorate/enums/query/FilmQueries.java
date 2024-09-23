@@ -13,13 +13,11 @@ public enum FilmQueries {
 
     FIND_BY_ID_QUERY("SELECT * FROM films WHERE id = ?"),
 
-    FIND_FILM_QUERY("SELECT r.* FROM films AS f " +
-                    "LEFT JOIN ratings AS r ON f.rating_id = r.id " +
-                    "WHERE f.id = ?"),
+    FIND_RATING_ID_QUERY("SELECT rating_id FROM films AS f WHERE id = ?"),
 
-    FIND_GENRES_BY_FILM_ID_QUERY("SELECT g.* FROM films_genres AS fg " +
-                                    "LEFT JOIN genres AS g ON fg.genre_id = g.id " +
-                                    "WHERE film_id = ?"),
+    FIND_GENRE_ID_QUERY("SELECT genre_id FROM films_genres WHERE film_id = ?"),
+
+    FIND_LIKES_BY_ID_QUERY("SELECT user_id FROM likes WHERE film_id = ?"),
 
     INSERT_FILM_QUERY("INSERT INTO films(name, description, releaseDate, duration, rating_id)VALUES (?, ?, ?, ?, ?)"),
 

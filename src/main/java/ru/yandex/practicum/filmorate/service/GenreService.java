@@ -22,7 +22,7 @@ public class GenreService {
     private final GenreStorage genreStorage;
 
     @Autowired
-    public GenreService(@Qualifier(/*"GenreDbStorage"*/"InMemoryGenreStorage") GenreStorage genreStorage) {
+    public GenreService(@Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
 

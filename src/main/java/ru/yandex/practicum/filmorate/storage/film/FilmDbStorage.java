@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,43 +11,22 @@ import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.genre.GenreBaseRowMapper;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Slf4j
 @Component("FilmDbStorage")
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     protected final RowMapper<Film> baseMapper;
-    protected final RowMapper<Genre> genreBaseMapper;
-    protected final RowMapper<Mpa> mpaBaseMapper;
 
-    public FilmDbStorage(JdbcTemplate jdbc, FilmBaseRowMapper baseMapper, GenreBaseRowMapper genreBaseMapper,
-                         RowMapper<Mpa> mpaBaseMapper) {
+    @Autowired
+    public FilmDbStorage(JdbcTemplate jdbc, FilmBaseRowMapper baseMapper) {
         super(jdbc);
         this.baseMapper = baseMapper;
-        this.genreBaseMapper = genreBaseMapper;
-        this.mpaBaseMapper = mpaBaseMapper;
-    }
-
-    @Override
-    public Mpa findRatingById(Long filmId) {
-        try {
-            return jdbc.queryForObject(FilmQueries.FIND_FILM_QUERY.toString(), mpaBaseMapper, filmId);
-        } catch (EmptyResultDataAccessException ignored) {
-            return new Mpa();
-        }
-    }
-
-    @Override
-    public Set<Genre> findGenresById(Long filmId) {
-        return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_GENRES_BY_FILM_ID_QUERY.toString(), genreBaseMapper, filmId));
     }
 
     @Override
@@ -78,8 +57,23 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
     }
 
+    public LinkedHashSet<Long> getLikes(Film film) {
+        return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_LIKES_BY_ID_QUERY.toString(),
+                (rs, rowNum) -> rs.getLong("user_id"), film.getId()));
+    }
+
     @Override
-    public void addGenre(Genre genre, Film film) {
+    public void deleteLike(Film film, User user) {
+        try {
+            delete(FilmQueries.DELETE_LIKE_QUERY.toString(), film.getId(), user.getId());
+        } catch (SQLWarningException e) {
+            throw new NotFoundException("Пользователь " + user.getName() + " ещё не ставил лайк фильму "
+                    + film.getName() + ". Удаление не возможно. " + e.getSQLWarning());
+        }
+    }
+
+    @Override
+    public void addGenreId(Genre genre, Film film) {
         String errMsg = "Для фильма " + film.getName() + "не удалось установить жанр " + genre.getName();
 
         try {
@@ -91,13 +85,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public void deleteLike(Film film, User user) {
-        try {
-            delete(FilmQueries.DELETE_LIKE_QUERY.toString(), film.getId(), user.getId());
-        } catch (SQLWarningException e) {
-            throw new NotFoundException("Пользователь " + user.getName() + " ещё не ставил лайк фильму "
-                    + film.getName() + ". Удаление не возможно. " + e.getSQLWarning());
-        }
+    public Long findRatingId(Long filmId) {
+        return findId(FilmQueries.FIND_RATING_ID_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public LinkedHashSet<Long> findGenresIds(Long filmId) {
+        return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_GENRE_ID_QUERY.toString(),
+                (rs, rowNum) -> rs.getLong("genre_id"), filmId));
     }
 
     @Override

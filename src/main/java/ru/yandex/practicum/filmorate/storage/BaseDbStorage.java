@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,6 +17,10 @@ import java.util.Optional;
 public class BaseDbStorage<T> {
     protected final JdbcTemplate jdbc;
 
+    public Long findId(String query, Object... params) {
+        return jdbc.queryForObject(query, Long.class, params);
+    }
+
     protected Optional<T> findOne(String query, RowMapper<T> mapper, Object... params) {
         try {
             T result = jdbc.queryForObject(query, mapper, params);
@@ -30,8 +35,12 @@ public class BaseDbStorage<T> {
     }
 
     protected boolean delete(String query, Object... params) {
-        int rowsDeleted = jdbc.update(query, params);
-        return rowsDeleted > 0;
+        try {
+            int rowsDeleted = jdbc.update(query, params);
+            return rowsDeleted > 0;
+        } catch (DataIntegrityViolationException exception) {
+            return false;
+        }
     }
 
     protected void update(String query, String errMsg, Object... params) {

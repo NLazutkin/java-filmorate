@@ -23,7 +23,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(@Qualifier(/*"UserDbStorage"*/"InMemoryUserStorage") UserStorage userStorage) {
+    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -34,13 +34,13 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.addFriend(userId, friendId);
 
-        log.debug("Добавляем " + names.getFirst() + " в список друзей " + names.getSecond());
+        log.debug("Добавляем " + names.getSecond() + " в список друзей " + names.getFirst());
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.deleteFriend(userId, friendId);
 
-        log.debug("Удаляем " + names.getFirst() + " из списка друзей " + names.getSecond());
+        log.debug("Удаляем " + names.getSecond() + " из списка друзей " + names.getFirst());
     }
 
     public Collection<UserDto> findFriends(Long userId) {
