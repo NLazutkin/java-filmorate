@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
@@ -14,10 +16,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component("InMemoryFilmStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films = new HashMap<>();
-    private final Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
-    private final Map<Long, Long> filmsMpaId = new HashMap<>();
+    Map<Long, Film> films = new HashMap<>();
+    Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
+    Map<Long, Long> filmsMpaId = new HashMap<>();
 
     // вспомогательный метод для генерации идентификатора нового поста
     private long getNextId() {

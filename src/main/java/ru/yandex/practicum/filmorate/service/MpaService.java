@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MpaService {
-    private final MpaStorage mpaStorage;
+    MpaStorage mpaStorage;
 
     @Autowired
     public MpaService(@Qualifier(/*"InMemoryMpaStorage"*/"MpaDbStorage") MpaStorage mpaStorage) {

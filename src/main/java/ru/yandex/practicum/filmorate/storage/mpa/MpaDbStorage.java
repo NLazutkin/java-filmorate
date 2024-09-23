@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,8 +18,9 @@ import java.util.Collection;
 
 @Slf4j
 @Component("MpaDbStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
-    protected final RowMapper<Mpa> baseMapper;
+    RowMapper<Mpa> baseMapper;
 
     @Autowired
     public MpaDbStorage(JdbcTemplate jdbc, MpaBaseRowMapper baseMapper) {

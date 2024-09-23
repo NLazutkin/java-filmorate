@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,9 +19,10 @@ import java.util.Collection;
 
 @Slf4j
 @Component("UserDbStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
-    protected final RowMapper<User> baseMapper;
-    protected final RowMapper<User> fullDataMapper;
+    RowMapper<User> baseMapper;
+    RowMapper<User> fullDataMapper;
 
     @Autowired
     public UserDbStorage(JdbcTemplate jdbc, UserBaseRowMapper baseMapper, UserRowMapper fullDataMapper) {

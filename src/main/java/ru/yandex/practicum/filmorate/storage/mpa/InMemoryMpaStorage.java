@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
@@ -10,8 +12,9 @@ import java.util.*;
 
 @Slf4j
 @Component("InMemoryMpaStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryMpaStorage implements MpaStorage {
-    private final Map<Long, Mpa> mpas = new HashMap<>();
+    Map<Long, Mpa> mpas = new HashMap<>();
 
     public InMemoryMpaStorage() {
         mpas.put(1L, new Mpa(1L, "G", "У фильма нет возрастных ограничений"));

@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
@@ -10,8 +12,9 @@ import java.util.*;
 
 @Slf4j
 @Component("InMemoryGenreStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryGenreStorage implements GenreStorage {
-    private final Map<Long, Genre> genres = new HashMap<>();
+    Map<Long, Genre> genres = new HashMap<>();
 
     public InMemoryGenreStorage() {
         genres.put(1L, new Genre(1L, "Комедия"));

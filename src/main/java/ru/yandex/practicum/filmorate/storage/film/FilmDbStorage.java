@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.SQLWarningException;
@@ -20,8 +22,9 @@ import java.util.LinkedHashSet;
 
 @Slf4j
 @Component("FilmDbStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
-    protected final RowMapper<Film> baseMapper;
+    RowMapper<Film> baseMapper;
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbc, FilmBaseRowMapper baseMapper) {

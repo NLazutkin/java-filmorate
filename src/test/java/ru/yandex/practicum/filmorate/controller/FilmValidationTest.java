@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.*;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,9 +12,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class FilmValidationTest {
-    private Film film;
-    private Validator validator;
+    Film film;
+    Validator validator;
 
     @BeforeEach
     void setUp() {

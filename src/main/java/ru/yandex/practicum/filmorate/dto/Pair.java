@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.dto;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pair<U, V> {
-    private U first;
-    private V second;
+    U first;
+    V second;
 
     public Pair(U first, V second) {
         this.first = first;

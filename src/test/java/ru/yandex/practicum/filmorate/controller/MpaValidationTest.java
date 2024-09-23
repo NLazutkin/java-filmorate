@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -11,9 +13,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class MpaValidationTest {
-    private Mpa mpa;
-    private Validator validator;
+    Mpa mpa;
+    Validator validator;
 
     @BeforeEach
     void setUp() {

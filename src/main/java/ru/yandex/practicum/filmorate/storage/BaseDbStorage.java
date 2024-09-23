@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,8 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class BaseDbStorage<T> {
-    protected final JdbcTemplate jdbc;
+    JdbcTemplate jdbc;
 
     public Long findId(String query, Object... params) {
         return jdbc.queryForObject(query, Long.class, params);

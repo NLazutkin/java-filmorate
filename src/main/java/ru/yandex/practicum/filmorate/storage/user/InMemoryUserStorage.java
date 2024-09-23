@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.Pair;
@@ -11,8 +13,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component("InMemoryUserStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Long, User> users = new HashMap<>();
+    Map<Long, User> users = new HashMap<>();
 
     private long getNextId() {
         long currentMaxId = users.keySet()

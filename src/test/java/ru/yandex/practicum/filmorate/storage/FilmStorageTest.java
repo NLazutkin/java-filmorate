@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,9 +23,10 @@ import java.util.LinkedHashSet;
 @JdbcTest
 @AutoConfigureTestDatabase
 @ComponentScan("ru.yandex.practicum.filmorate")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmStorageTest {
-    private final FilmDbStorage filmStorage;
+    FilmDbStorage filmStorage;
 
     @Test
     public void testFindFilmById() {

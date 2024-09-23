@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,8 +18,9 @@ import java.util.Collection;
 
 @Slf4j
 @Component("GenreDbStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
-    protected final RowMapper<Genre> baseMapper;
+    RowMapper<Genre> baseMapper;
 
     @Autowired
     public GenreDbStorage(JdbcTemplate jdbc, GenreBaseRowMapper baseMapper) {
