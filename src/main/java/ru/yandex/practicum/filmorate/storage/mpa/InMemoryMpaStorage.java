@@ -47,14 +47,14 @@ public class InMemoryMpaStorage implements MpaStorage {
     @Override
     public Mpa findMpa(Mpa mpa) {
         return Optional.ofNullable(mpas.get(mpa.getId()))
-                .orElseThrow(() -> new MpaNotFoundException("В запросе не корректный рейтинг MPA с ID " + mpa.getId()));
+                .orElseThrow(() -> new MpaNotFoundException(String.format("В запросе не корректный рейтинг MPA с ID %d", mpa.getId())));
     }
 
 
     @Override
     public Mpa findMpa(Long mpaId) {
         return Optional.ofNullable(mpas.get(mpaId))
-                .orElseThrow(() -> new NotFoundException("Рейтинг MPA с ID " + mpaId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Рейтинг MPA с ID %d не найден", mpaId)));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class InMemoryMpaStorage implements MpaStorage {
     @Override
     public Mpa update(Mpa newMpa) {
         mpas.put(newMpa.getId(), newMpa);
-        log.trace("Данные о рейтинге " + newMpa.getName() + " обновлены!");
+        log.trace(String.format("Данные о рейтинге %s обновлены!", newMpa.getName()));
         return newMpa;
     }
 

@@ -45,22 +45,22 @@ public class FilmService {
     }
 
     public FilmDto findFilm(Long filmId) {
-        log.debug("Поиск фильма с ID " + filmId);
+        log.debug(String.format("Поиск фильма с ID %d", filmId));
 
         Film film = filmStorage.findFilm(filmId);
 
-        log.debug("Ищем жанры фильма " + film.getName());
+        log.debug(String.format("Ищем жанры фильма %s", film.getName()));
         LinkedHashSet<Genre> genres = filmStorage.findGenresIds(filmId).stream()
                 .map(genreStorage::findGenre)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        log.debug("Ищем лайки фильма " + film.getName());
+        log.debug(String.format("Ищем лайки фильма %s", film.getName()));
         LinkedHashSet<Long> likes = filmStorage.getLikes(film);
 
-        log.debug("Ищем рейтинг фильма " + film.getName());
+        log.debug(String.format("Ищем рейтинг фильма %s", film.getName()));
         Mpa mpa = mpaStorage.findMpa(filmStorage.findRatingId(filmId));
 
-        log.debug("Фильм " + film.getName() + " найден!");
+        log.debug(String.format("Фильм %s найден!", film.getName()));
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes);
     }
 
@@ -72,7 +72,7 @@ public class FilmService {
 
         filmStorage.addLike(film, user);
 
-        log.debug("Пользователь " + user.getName() + " ставит лайк фильму " + film.getName());
+        log.debug(String.format("Пользователь %s ставит лайк фильму %s", user.getName(), film.getName()));
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -83,7 +83,7 @@ public class FilmService {
 
         filmStorage.deleteLike(film, user);
 
-        log.debug("Пользователь " + user.getName() + " убирает лайк с фильма " + film.getName());
+        log.debug(String.format("Пользователь %s убирает лайк с фильма %s", user.getName(), film.getName()));
     }
 
     public Collection<FilmDto> findPopular(Integer count) {
@@ -91,7 +91,7 @@ public class FilmService {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
 
-        log.debug("Получаем список из первых " + count + " фильмов по количеству лайков");
+        log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
 
         return filmStorage.findPopular(count).stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
@@ -102,7 +102,7 @@ public class FilmService {
     }
 
     public FilmDto create(NewFilmRequest request) {
-        log.debug("Создаем запись о фильме " + request.getName());
+        log.debug(String.format("Создаем запись о фильме %s", request.getName()));
         Film film = FilmMapper.mapToFilm(request);
 
         if (film.getMpa().getId() != null) {
@@ -116,7 +116,7 @@ public class FilmService {
                 .peek(genre -> filmStorage.addGenreId(genre, createdfilm))
                 .toList();
 
-        log.trace("Фильм " + createdfilm.getName() + " сохранен!");
+        log.trace(String.format("Фильм %s сохранен!", createdfilm.getName()));
         return FilmMapper.mapToFilmDto(createdfilm);
     }
 

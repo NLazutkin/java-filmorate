@@ -32,7 +32,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     }
 
     private User findById(Long userId) {
-        return findOne(UserQueries.FIND_BY_ID_QUERY.toString(), baseMapper, userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return findOne(UserQueries.FIND_BY_ID_QUERY.toString(), baseMapper, userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь c ID %d не найден", userId)));
     }
 
     @Override
@@ -42,7 +43,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public User findUser(Long userId) {
-        return findOne(UserQueries.FIND_USER_QUERY.toString(), fullDataMapper, userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return findOne(UserQueries.FIND_USER_QUERY.toString(), fullDataMapper, userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь c ID %d не найден", userId)));
     }
 
     @Override
@@ -53,7 +55,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public Collection<User> findFriends(Long userId) {
         User user = findById(userId);
-        log.debug("Список друзей " + user.getName());
+        log.debug(String.format("Список друзей %s", user.getName()));
         return findMany(UserQueries.FIND_ALL_FRIENDS_QUERY.toString(), fullDataMapper, userId);
     }
 

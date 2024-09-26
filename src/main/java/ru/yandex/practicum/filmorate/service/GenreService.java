@@ -42,7 +42,7 @@ public class GenreService {
         log.debug("Создаем запись о жанре");
 
         if (genreStorage.isGenreWithSameNameExist(request.getName())) {
-            throw new DuplicatedDataException("Жанр с именем\"" + request.getName() + "\" уже существует");
+            throw new DuplicatedDataException(String.format("Жанр с именем \"%s\" уже существует", request.getName()));
         }
 
         Genre mpa = GenreMapper.mapToGenre(request);
@@ -66,7 +66,7 @@ public class GenreService {
 
     public boolean delete(Long genreId) {
         Genre genre = genreStorage.findGenre(genreId);
-        log.debug("Удаляем данные жанра " + genre.getName());
+        log.debug(String.format("Удаляем данные жанра %s", genre.getName()));
         return genreStorage.delete(genreId);
     }
 }

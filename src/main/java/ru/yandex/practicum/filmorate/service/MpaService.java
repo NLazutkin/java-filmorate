@@ -44,7 +44,7 @@ public class MpaService {
         log.debug("Создаем запись о рейтинге MPA");
 
         if (mpaStorage.isMpaWithSameNameExist(request.getName())) {
-            throw new DuplicatedDataException("Рейтинг с именем\"" + request.getName() + "\" уже существует");
+            throw new DuplicatedDataException(String.format("Рейтинг с именем \"%s\" уже существует", request.getName()));
         }
 
         Mpa mpa = MpaMapper.mapToMpa(request);
@@ -68,7 +68,7 @@ public class MpaService {
 
     public boolean delete(Long mpaId) {
         Mpa mpa = mpaStorage.findMpa(mpaId);
-        log.debug("Удаляем данные рейтинга " + mpa.getName());
+        log.debug(String.format("Удаляем данные рейтинга %s", mpa.getName()));
         return mpaStorage.delete(mpaId);
     }
 }

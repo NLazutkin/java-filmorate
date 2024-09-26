@@ -37,13 +37,13 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.addFriend(userId, friendId);
 
-        log.debug("Добавляем " + names.getSecond() + " в список друзей " + names.getFirst());
+        log.debug(String.format("Добавляем %s в список друзей %s", names.getSecond(), names.getFirst()));
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.deleteFriend(userId, friendId);
 
-        log.debug("Удаляем " + names.getSecond() + " из списка друзей " + names.getFirst());
+        log.debug(String.format("Удаляем %s из списка друзей %s", names.getSecond(), names.getFirst()));
     }
 
     public Collection<UserDto> findFriends(Long userId) {
@@ -75,7 +75,7 @@ public class UserService {
         log.debug("Создаем запись пользователя");
 
         if (userStorage.isUserWithEmailExist(request.getEmail())) {
-            throw new DuplicatedDataException("Этот E-mail \"" + request.getEmail() + "\" уже используется");
+            throw new DuplicatedDataException(String.format("Этот E-mail \"%s\" уже используется", request.getEmail()));
         }
 
         if (request.getName() == null || request.getName().isBlank()) {
@@ -104,7 +104,7 @@ public class UserService {
 
     public boolean delete(Long filmId) {
         User user = userStorage.findUser(filmId);
-        log.debug("Удаляем данные пользователя " + user.getName());
+        log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
         return userStorage.delete(filmId);
     }
 }

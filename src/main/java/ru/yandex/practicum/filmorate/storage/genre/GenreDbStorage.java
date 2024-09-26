@@ -36,13 +36,13 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     @Override
     public Genre findGenre(Genre genre) {
         return findOne(GenreQueries.FIND_BY_ID_QUERY.toString(), baseMapper, genre.getId())
-                .orElseThrow(() -> new GenreNotFoundException("В запросе не корректный жанр с ID " + genre.getId()));
+                .orElseThrow(() -> new GenreNotFoundException(String.format("В запросе не корректный жанр с ID %d", genre.getId())));
     }
 
     @Override
     public Genre findGenre(Long mpaId) {
         return findOne(GenreQueries.FIND_BY_ID_QUERY.toString(), baseMapper, mpaId)
-                .orElseThrow(() -> new NotFoundException("Жанр с ID " + mpaId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Жанр с ID %d не найден", mpaId)));
     }
 
     @Override

@@ -35,7 +35,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Film findFilm(Long filmId) {
         return findOne(FilmQueries.FIND_BY_ID_QUERY.toString(), baseMapper, filmId)
-                .orElseThrow(() -> new NotFoundException("Фильм c ID " + filmId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Фильм c ID %d не найден", filmId)));
     }
 
     @Override
@@ -50,13 +50,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public void addLike(Film film, User user) {
-        String errMsg = "Пользователь " + user.getName() + "не смог поставить лайк фильму" + film.getName();
+        String errMsg = String.format("Пользователь %s не смог поставить лайк фильму %s", user.getName(), film.getName());
 
         try {
             update(FilmQueries.INSERT_LIKE_QUERY.toString(), errMsg, film.getId(), user.getId());
         } catch (SQLWarningException e) {
-            throw new DuplicatedDataException("Пользователь " + user.getName() + " уже ставил лайк фильму "
-                    + film.getName() + ". " + e.getSQLWarning());
+            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму %s. %s",
+                    user.getName(), film.getName(), e.getSQLWarning()));
         }
     }
 
@@ -70,20 +70,20 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         try {
             delete(FilmQueries.DELETE_LIKE_QUERY.toString(), film.getId(), user.getId());
         } catch (SQLWarningException e) {
-            throw new NotFoundException("Пользователь " + user.getName() + " ещё не ставил лайк фильму "
-                    + film.getName() + ". Удаление не возможно. " + e.getSQLWarning());
+            throw new NotFoundException(String.format("Пользователь %s ещё не ставил лайк фильму %s. Удаление не возможно. %s",
+                    user.getName(), film.getName(), e.getSQLWarning()));
         }
     }
 
     @Override
     public void addGenreId(Genre genre, Film film) {
-        String errMsg = "Для фильма " + film.getName() + "не удалось установить жанр " + genre.getName();
+        String errMsg = String.format("Для фильма %s не удалось установить жанр %s", film.getName(), genre.getName());
 
         try {
             update(FilmQueries.INSERT_FILM_GENRE_QUERY.toString(), errMsg, film.getId(), genre.getId());
         } catch (SQLWarningException e) {
-            throw new DuplicatedDataException("Для фильма " + film.getName() + " жанр " + genre.getName()
-                    + " уже установлен. " + e.getSQLWarning());
+            throw new DuplicatedDataException(String.format("Для фильма %s жанр %s уже установлен. %s",
+                    film.getName(), genre.getName(), e.getSQLWarning()));
         }
     }
 

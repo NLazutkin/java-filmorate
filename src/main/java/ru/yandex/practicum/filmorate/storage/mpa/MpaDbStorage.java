@@ -36,13 +36,13 @@ public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
     @Override
     public Mpa findMpa(Mpa mpa) {
         return findOne(MpaQueries.FIND_BY_ID_QUERY.toString(), baseMapper, mpa.getId())
-                .orElseThrow(() -> new MpaNotFoundException("В запросе не корректный рейтинг MPA с ID " + mpa.getId()));
+                .orElseThrow(() -> new MpaNotFoundException(String.format("В запросе не корректный рейтинг MPA с ID %s", mpa.getId())));
     }
 
     @Override
     public Mpa findMpa(Long mpaId) {
         return findOne(MpaQueries.FIND_BY_ID_QUERY.toString(), baseMapper, mpaId)
-                .orElseThrow(() -> new NotFoundException("Рейтинг MPA с ID " + mpaId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Рейтинг MPA с ID %d не найден", mpaId)));
     }
 
     @Override

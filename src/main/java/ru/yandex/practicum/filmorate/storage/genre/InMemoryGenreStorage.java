@@ -48,13 +48,13 @@ public class InMemoryGenreStorage implements GenreStorage {
     @Override
     public Genre findGenre(Genre genre) {
         return Optional.ofNullable(genres.get(genre.getId()))
-                .orElseThrow(() -> new GenreNotFoundException("В запросе не корректный жанр с ID " + genre.getId()));
+                .orElseThrow(() -> new GenreNotFoundException(String.format("В запросе не корректный жанр с ID %d", genre.getId())));
     }
 
     @Override
     public Genre findGenre(Long genreId) {
         return Optional.ofNullable(genres.get(genreId))
-                .orElseThrow(() -> new NotFoundException("Жанр с ID " + genreId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Жанр с ID %d не найден", genreId)));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class InMemoryGenreStorage implements GenreStorage {
     @Override
     public Genre update(Genre newGenre) {
         genres.put(newGenre.getId(), newGenre);
-        log.trace("Данные о жанре " + newGenre.getName() + " обновлены!");
+        log.trace(String.format("Данные о жанре %s обновлены!", newGenre.getName()));
         return newGenre;
     }
 

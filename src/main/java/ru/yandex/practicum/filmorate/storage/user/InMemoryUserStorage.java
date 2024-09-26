@@ -31,7 +31,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User findUser(Long userId) {
-        return Optional.ofNullable(users.get(userId)).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return Optional.ofNullable(users.get(userId))
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь c ID %d не найден", userId)));
     }
 
     public Collection<User> getUsers() {
@@ -40,7 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Collection<User> findFriends(Long userId) {
         User user = findUser(userId);
-        log.debug("Список друзей " + user.getName());
+        log.debug(String.format("Список друзей пользователя %s", user.getName()));
         Set<Long> friendsIds = user.getFriends();
 
         return friendsIds.stream().map(this::findUser).collect(Collectors.toList());
@@ -66,13 +67,13 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User create(User user) {
         user.setId(getNextId());
-        log.trace("Данные пользователя " + user.getName() + " сохранены!");
+        log.trace(String.format("Данные пользователя %s сохранены!", user.getName()));
         users.put(user.getId(), user);
         return user;
     }
 
     public User update(User newUser) {
-        log.trace("Данные пользователя " + newUser.getName() + " обновлены!");
+        log.trace(String.format("Данные пользователя %s обновлены!", newUser.getName()));
         users.put(newUser.getId(), newUser);
         return newUser;
     }

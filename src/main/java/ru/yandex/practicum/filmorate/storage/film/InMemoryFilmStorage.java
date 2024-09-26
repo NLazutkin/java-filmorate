@@ -39,7 +39,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilm(Long filmId) {
-        return Optional.ofNullable(films.get(filmId)).orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
+        return Optional.ofNullable(films.get(filmId))
+                .orElseThrow(() -> new NotFoundException(String.format("Фильм с ID %d не найден", filmId)));
     }
 
     @Override
@@ -54,8 +55,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void addLike(Film film, User user) {
         if (film.getLikes().contains(user.getId())) {
-            throw new DuplicatedDataException("Пользователь " + user.getName()
-                    + " уже ставил лайк фильму " + film.getName());
+            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму %s",
+                    user.getName(), film.getName()));
         }
 
         film.getLikes().add(user.getId());
@@ -65,7 +66,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         LinkedHashSet<Long> likes = film.getLikes();
 
         if (likes == null || likes.isEmpty()) {
-            log.trace("У фильма " + film.getName() + " нет лайков");
+            log.trace(String.format("У фильма %s нет лайков", film.getName()));
             return new LinkedHashSet<>();
         }
 
@@ -75,8 +76,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteLike(Film film, User user) {
         if (!film.getLikes().contains(user.getId())) {
-            throw new NotFoundException("Пользователь " + user.getName()
-                    + "не ставил лайк фильму " + film.getName() + ". Удалить лайк невозможно");
+            throw new NotFoundException(String.format("Пользователь %s не ставил лайк фильму %s. Удалить лайк невозможно",
+                    user.getName(), film.getName()));
         }
 
         film.getLikes().remove(user.getId());
@@ -105,7 +106,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Long findRatingId(Long filmId) {
         return Optional.ofNullable(filmsMpaId.get(filmId))
-                .orElseThrow(() -> new NotFoundException("Рейтинг для фильма с ID " + filmId + " не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Рейтинг для фильма с ID %d не найден", filmId)));
     }
 
     @Override
@@ -121,7 +122,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film update(Film newFilm) {
         films.put(newFilm.getId(), newFilm);
         filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
-        log.trace("Данные о фильме " + newFilm.getName() + " обновлены!");
+        log.trace(String.format("Данные о фильме %s обновлены!",  newFilm.getName()));
         return newFilm;
     }
 
