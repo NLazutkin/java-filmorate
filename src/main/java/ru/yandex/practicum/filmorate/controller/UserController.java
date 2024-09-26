@@ -5,21 +5,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
 
-@RestController
-@RequestMapping("/users")
 @Slf4j
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final String userFriendsPath = "/{id}/friends/{friend-id}";
 
     @GetMapping("/{id}")
-    public User findUser(@PathVariable("id") Long userId) {
+    public UserDto findUser(@PathVariable("id") Long userId) {
         return userService.findUser(userId);
     }
 
@@ -34,28 +36,33 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public Collection<User> findFriends(@PathVariable("id") Long userId) {
+    public Collection<UserDto> findFriends(@PathVariable("id") Long userId) {
         return userService.findFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{other-id}")
-    public Collection<User> findOther(@PathVariable("id") Long userId, @PathVariable("other-id") Long otherId) {
+    public Collection<UserDto> findOther(@PathVariable("id") Long userId, @PathVariable("other-id") Long otherId) {
         return userService.findOther(userId, otherId);
     }
 
     @GetMapping
-    public Collection<User> getUsers() {
+    public Collection<UserDto> getUsers() {
         return userService.getUsers();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Valid @RequestBody User user) {
+    public UserDto create(@Valid @RequestBody NewUserRequest user) {
         return userService.create(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
+    public UserDto update(@Valid @RequestBody UpdateUserRequest newUser) {
         return userService.update(newUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public boolean delete(@PathVariable("id") Long userId) {
+        return userService.delete(userId);
     }
 }

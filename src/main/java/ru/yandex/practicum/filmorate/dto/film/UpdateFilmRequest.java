@@ -1,21 +1,19 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.film;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.annotation.DateAfterStandart;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
-public class Film {
+public class UpdateFilmRequest {
     Long id;
     @NotBlank(message = "Название фильма не должно быть пустым")
     String name;
@@ -25,7 +23,16 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Продолжительность фильма не может быть отрицательным числом")
     Long duration;
-    LinkedHashSet<Long> likes = new LinkedHashSet<>();
-    LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-    Mpa mpa;
+
+    public boolean hasDescription() {
+        return !StringUtils.isBlank(this.description);
+    }
+
+    public boolean hasReleaseDate() {
+        return this.releaseDate != null;
+    }
+
+    public boolean hasDuration() {
+        return this.duration != null;
+    }
 }

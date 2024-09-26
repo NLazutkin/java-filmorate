@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.film;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.annotation.DateAfterStandart;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
-public class Film {
-    Long id;
+public class NewFilmRequest {
     @NotBlank(message = "Название фильма не должно быть пустым")
     String name;
     @Size(max = 200, message = "Описание фильма не должно превышать 200 символов")

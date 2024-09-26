@@ -1,102 +1,141 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
-@RequiredArgsConstructor
+@Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    FilmStorage filmStorage;
+    UserStorage userStorage;
+    MpaStorage mpaStorage;
+    GenreStorage genreStorage;
 
-    public Film findFilm(Long filmId) {
-        return filmStorage.findFilm(filmId).orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
+    @Autowired
+    public FilmService(@Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
+                       @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
+                       @Qualifier("MpaDbStorage"/*"InMemoryMpaStorage"*/) MpaStorage mpaStorage,
+                       @Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
+    }
+
+    public FilmDto findFilm(Long filmId) {
+        log.debug(String.format("Поиск фильма с ID %d", filmId));
+
+        Film film = filmStorage.findFilm(filmId);
+
+        log.debug(String.format("Ищем жанры фильма %s", film.getName()));
+        LinkedHashSet<Genre> genres = filmStorage.findGenresIds(filmId).stream()
+                .map(genreStorage::findGenre)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        log.debug(String.format("Ищем лайки фильма %s", film.getName()));
+        LinkedHashSet<Long> likes = filmStorage.getLikes(film);
+
+        log.debug(String.format("Ищем рейтинг фильма %s", film.getName()));
+        Mpa mpa = mpaStorage.findMpa(filmStorage.findRatingId(filmId));
+
+        log.debug(String.format("Фильм %s найден!", film.getName()));
+        return FilmMapper.mapToFilmDto(film, mpa, genres, likes);
     }
 
     public void addLike(Long filmId, Long userId) {
-        Optional<Film> film = filmStorage.findFilm(filmId);
-        Optional<User> user = userStorage.findUser(userId);
+        log.trace("Попытка пользователя поставить лайк фильму...");
 
-        if (film.isEmpty()) {
-            throw new NotFoundException("Фильм с ID " + filmId + " не найден. Лайк не проставлен.");
-        } else if (user.isEmpty()) {
-            throw new NotFoundException("Пользователь с ID " + userId + " не найден. Лайк не проставлен.");
-        } else if (film.get().getLikes().contains(userId)) {
-            throw new DuplicatedDataException("Пользователь " + user.get().getName()
-                    + " уже ставил лайк фильму " + film.get().getName());
-        }
+        Film film = filmStorage.findFilm(filmId);
+        User user = userStorage.findUser(userId);
 
-        log.debug("Пользователь " + user.get().getName() + " ставит лайк фильму " + film.get().getName());
-        film.get().getLikes().add(userId);
+        filmStorage.addLike(film, user);
+
+        log.debug(String.format("Пользователь %s ставит лайк фильму %s", user.getName(), film.getName()));
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        Optional<Film> film = filmStorage.findFilm(filmId);
-        Optional<User> user = userStorage.findUser(userId);
+        log.trace("Попытка удалить лайк с фильма...");
 
-        if (film.isEmpty()) {
-            throw new NotFoundException("Фильм с ID " + filmId + " не найден. Лайк не удален.");
-        } else if (user.isEmpty()) {
-            throw new NotFoundException("Пользователь с ID " + userId + " не найден. Лайк не удален.");
-        } else if (!film.get().getLikes().contains(userId)) {
-            throw new DuplicatedDataException("Пользователь " + user.get().getName()
-                    + "не ставил лайк фильму " + film.get().getName() + ".Удалить лайк невозможно");
-        }
+        Film film = filmStorage.findFilm(filmId);
+        User user = userStorage.findUser(userId);
 
-        log.debug("Пользователь " + user.get().getName() + " убирает лайк с фильма " + film.get().getName());
-        film.get().getLikes().remove(userId);
+        filmStorage.deleteLike(film, user);
+
+        log.debug(String.format("Пользователь %s убирает лайк с фильма %s", user.getName(), film.getName()));
     }
 
-    public Collection<Film> findPopular(Integer count) {
+    public Collection<FilmDto> findPopular(Integer count) {
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
 
-        log.debug("Получаем список из первых " + count + " фильмов по количеству лайков");
+        log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
 
-        return filmStorage.findAll()
-                .stream()
-                .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.findPopular(count).stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
 
-    public Collection<Film> findAll() {
+    public Collection<FilmDto> findAll() {
         log.debug("Получаем записи о всех фильмах");
-        return filmStorage.findAll();
+        return filmStorage.findAll().stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
 
-    public Film create(Film film) {
-        log.debug("Создаем запись о фильме " + film.getName());
-        return filmStorage.create(film);
+    public FilmDto create(NewFilmRequest request) {
+        log.debug(String.format("Создаем запись о фильме %s", request.getName()));
+        Film film = FilmMapper.mapToFilm(request);
+
+        if (film.getMpa().getId() != null) {
+            Mpa mpa = mpaStorage.findMpa(film.getMpa());
+        }
+
+        Film createdfilm = filmStorage.create(film);
+
+        Collection<Genre> genres = film.getGenres().stream()
+                .map(genreStorage::findGenre)
+                .peek(genre -> filmStorage.addGenreId(genre, createdfilm))
+                .toList();
+
+        log.trace(String.format("Фильм %s сохранен!", createdfilm.getName()));
+        return FilmMapper.mapToFilmDto(createdfilm);
     }
 
-    public Film update(Film newFilm) {
+    public FilmDto update(UpdateFilmRequest request) {
         log.debug("Обновляем данные фильма");
 
-        if (newFilm.getId() == null) {
+        if (request.getId() == null) {
             throw new ValidationException("Не указан Id фильма!");
         }
 
-        Optional<Film> oldFilm = filmStorage.findFilm(newFilm.getId());
-        if (oldFilm.isPresent()) {
-            return filmStorage.update(newFilm);
-        }
+        Film updatedFilm = FilmMapper.updateFilmFields(filmStorage.findFilm(request.getId()), request);
+        updatedFilm = filmStorage.update(updatedFilm);
 
-        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " под названием \"" + newFilm.getName() + "\" не найден");
+        return FilmMapper.mapToFilmDto(updatedFilm);
+    }
+
+    public boolean delete(Long filmId) {
+        Film film = filmStorage.findFilm(filmId);
+        log.debug("Удаляем данные фильма " + film.getName());
+        return filmStorage.delete(filmId);
     }
 }
