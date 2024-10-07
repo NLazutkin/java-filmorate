@@ -7,7 +7,7 @@ public enum  GenreQueries {
 
     FIND_BY_NAME_QUERY("SELECT * FROM genres WHERE name = ?"),
 
-    INSERT_MPA_QUERY("INSERT INTO genres(name)VALUES (?)"),
+    INSERT_GENRE_QUERY("INSERT INTO genres(name)VALUES (?)"),
 
     UPDATE_QUERY("UPDATE genres SET name = ? WHERE id = ?"),
 

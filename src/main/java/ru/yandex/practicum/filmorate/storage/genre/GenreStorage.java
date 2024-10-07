@@ -15,7 +15,7 @@ public interface GenreStorage {
 
     Genre update(Genre genre);
 
-    boolean delete(Long id);
+    boolean delete(Long genreId);
 
     boolean isGenreWithSameNameExist(String name);
 }

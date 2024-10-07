@@ -62,7 +62,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.getLikes().add(user.getId());
     }
 
-    public LinkedHashSet<Long> getLikes(Film film) {
+    public LinkedHashSet<Long> getLikes(Long filmId) {
+        Film film = films.get(filmId);
         LinkedHashSet<Long> likes = film.getLikes();
 
         if (likes == null || likes.isEmpty()) {

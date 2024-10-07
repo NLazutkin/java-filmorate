@@ -49,7 +49,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void findFriends() {
+    public void testFindFriends() {
         assertThat(userStorage.findFriends(1L)).isNotEmpty()
                 .hasSize(2)
                 .isInstanceOf(Collection.class)
@@ -59,7 +59,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void addFriend() {
+    public void testAddFriend() {
         Pair<String, String> names = new Pair<>("Jack", "Sparrow");
 
         assertThat(userStorage.addFriend(2L, 3L))
@@ -69,7 +69,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void deleteFriend() {
+    public void testDeleteFriend() {
         Pair<String, String> names = new Pair<>("Capitan", "Sparrow");
 
         assertThat(userStorage.deleteFriend(1L, 3L))
@@ -79,7 +79,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void create() {
+    public void testCreate() {
         User newUser = new User();
         newUser.setId(4L);
         newUser.setEmail("WillTurner@yandex.ru");
@@ -94,7 +94,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void update() {
+    public void testUpdate() {
         User newUser = new User();
         newUser.setId(3L);
         newUser.setEmail("TheSparrow@yandex.ru");
@@ -112,7 +112,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void delete() {
+    public void testDelete() {
         assertThat(userStorage.delete(3L)).isTrue();
     }
 

@@ -40,9 +40,9 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
-    public Genre findGenre(Long mpaId) {
-        return findOne(GenreQueries.FIND_BY_ID_QUERY.toString(), baseMapper, mpaId)
-                .orElseThrow(() -> new NotFoundException(String.format("Жанр с ID %d не найден", mpaId)));
+    public Genre findGenre(Long genreId) {
+        return findOne(GenreQueries.FIND_BY_ID_QUERY.toString(), baseMapper, genreId)
+                .orElseThrow(() -> new NotFoundException(String.format("Жанр с ID %d не найден", genreId)));
     }
 
     @Override
@@ -52,20 +52,20 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
 
     @Override
     public Genre create(Genre genre) {
-        long id = insert(GenreQueries.INSERT_MPA_QUERY.toString(), genre.getName());
+        long id = insert(GenreQueries.INSERT_GENRE_QUERY.toString(), genre.getName());
         genre.setId(id);
         return genre;
     }
 
     @Override
-    public Genre update(Genre newMpa) {
+    public Genre update(Genre newGenre) {
         update(GenreQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные о жанре",
-                newMpa.getName(), newMpa.getId());
-        return newMpa;
+                newGenre.getName(), newGenre.getId());
+        return newGenre;
     }
 
     @Override
-    public boolean delete(Long id) {
-        return delete(GenreQueries.DELETE_QUERY.toString(), id);
+    public boolean delete(Long genreId) {
+        return delete(GenreQueries.DELETE_QUERY.toString(), genreId);
     }
 }

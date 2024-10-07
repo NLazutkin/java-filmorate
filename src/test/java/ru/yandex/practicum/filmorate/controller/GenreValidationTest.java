@@ -25,7 +25,7 @@ public class GenreValidationTest {
     }
 
     @Test
-    void setMpaWithCorrectData() {
+    void setGenreWithCorrectData() {
         genre.setId(1L);
         genre.setName("Комедия");
 
@@ -36,7 +36,7 @@ public class GenreValidationTest {
     }
 
     @Test
-    void setMpaWithEmptyData() {
+    void setGenreWithEmptyData() {
         Set<ConstraintViolation<Genre>> violations = validator.validate(genre);
 
         assertEquals(1, violations.size());

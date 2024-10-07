@@ -36,7 +36,7 @@ public class GenreController {
         return genreService.create(genre);
     }
 
-    @PutMapping(genrePath)
+    @PutMapping
     public GenreDto update(@Valid @RequestBody UpdateGenreRequest newGenre) {
         return genreService.update(newGenre);
     }

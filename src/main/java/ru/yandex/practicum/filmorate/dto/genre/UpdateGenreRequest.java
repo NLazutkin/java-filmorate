@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateGenreRequest {
-    @NotNull(message = "Название рейтинга не должно быть пустым")
     Long id;
+    @NotNull(message = "Название рейтинга не должно быть пустым")
     String name;
 }

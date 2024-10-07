@@ -60,9 +60,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
     }
 
-    public LinkedHashSet<Long> getLikes(Film film) {
+    public LinkedHashSet<Long> getLikes(Long filmId) {
         return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_LIKES_BY_ID_QUERY.toString(),
-                (rs, rowNum) -> rs.getLong("user_id"), film.getId()));
+                (rs, rowNum) -> rs.getLong("user_id"), filmId));
     }
 
     @Override

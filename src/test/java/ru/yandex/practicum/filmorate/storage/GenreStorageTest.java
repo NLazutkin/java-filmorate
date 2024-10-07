@@ -30,7 +30,7 @@ class GenreStorageTest {
     }
 
     @Test
-    public void findAll() {
+    public void testFindAll() {
         assertThat(genreStorage.findAll()).isNotEmpty()
                 .hasSize(6)
                 .filteredOn("name", "Драма")
@@ -39,7 +39,7 @@ class GenreStorageTest {
     }
 
     @Test
-    public void create() {
+    public void testCreate() {
         Genre newGenre = new Genre();
         newGenre.setName("Фантастика");
 
@@ -50,7 +50,7 @@ class GenreStorageTest {
     }
 
     @Test
-    public void update() {
+    public void testUpdate() {
         Genre newGenre = new Genre();
         newGenre.setId(1L);
         newGenre.setName("Супер комедия");
@@ -62,7 +62,7 @@ class GenreStorageTest {
     }
 
     @Test
-    public void delete() {
+    public void testDelete() {
         assertThat(genreStorage.delete(6L)).isFalse();
     }
 

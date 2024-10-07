@@ -45,10 +45,10 @@ public class GenreService {
             throw new DuplicatedDataException(String.format("Жанр с именем \"%s\" уже существует", request.getName()));
         }
 
-        Genre mpa = GenreMapper.mapToGenre(request);
-        mpa = genreStorage.create(mpa);
+        Genre genre = GenreMapper.mapToGenre(request);
+        genre = genreStorage.create(genre);
 
-        return GenreMapper.mapToGenreDto(mpa);
+        return GenreMapper.mapToGenreDto(genre);
     }
 
     public GenreDto update(UpdateGenreRequest request) {

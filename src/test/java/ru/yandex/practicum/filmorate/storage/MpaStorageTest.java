@@ -31,7 +31,7 @@ public class MpaStorageTest {
     }
 
     @Test
-    public void findAll() {
+    public void testFindAll() {
         assertThat(mpaStorage.findAll()).isNotEmpty()
                 .hasSize(5)
                 .filteredOn("name", "PG-13")
@@ -40,7 +40,7 @@ public class MpaStorageTest {
     }
 
     @Test
-    public void create() {
+    public void testCreate() {
         Mpa newMpa = new Mpa();
         newMpa.setName("PG-18");
         newMpa.setDescription("Лицам после 18 лет просмотр разрешен");
@@ -52,7 +52,7 @@ public class MpaStorageTest {
     }
 
     @Test
-    public void update() {
+    public void testUpdate() {
         Mpa newMpa = new Mpa();
         newMpa.setId(1L);
         newMpa.setName("GG");
@@ -65,7 +65,7 @@ public class MpaStorageTest {
     }
 
     @Test
-    public void delete() {
+    public void testDelete() {
         assertThat(mpaStorage.delete(6L)).isFalse();
     }
 
