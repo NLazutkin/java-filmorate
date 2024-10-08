@@ -45,6 +45,13 @@ public class FilmController {
         return filmService.findAll();
     }
 
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilms(@RequestParam String query,
+                                           @RequestParam String by) {
+        log.debug("Запрос на поиск фильмов: query='{}', by='{}'", query, by);
+        return filmService.searchFilms(query, by);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FilmDto create(@Valid @RequestBody NewFilmRequest film) {

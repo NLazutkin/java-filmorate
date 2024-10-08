@@ -57,6 +57,42 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes);
     }
 
+    public Collection<FilmDto> searchFilms(String query, String by) {
+        log.debug("Поиск фильмов по запросу '{}' по полям '{}'", query, by);
+
+        if (query == null || query.isBlank()) {
+            throw new ValidationException("Параметр 'query' не должен быть пустым");
+        }
+        if (by == null || by.isBlank()) {
+            throw new ValidationException("Параметр 'by' не должен быть пустым");
+        }
+
+        String[] byParams = by.split(",");
+        boolean searchByTitle = false;
+        boolean searchByDirector = false;
+
+        for (String param : byParams) {
+            String trimmedParam = param.trim().toLowerCase();
+            if (trimmedParam.equals("title")) {
+                searchByTitle = true;
+            } else if (trimmedParam.equals("director")) {
+                searchByDirector = true;
+            } else {
+                throw new ValidationException("Недопустимое значение параметра 'by': " + param);
+            }
+        }
+
+        if (!searchByTitle && !searchByDirector) {
+            throw new ValidationException("Параметр 'by' должен содержать 'title' или 'director'");
+        }
+
+        Collection<Film> films = filmStorage.searchFilms(query, searchByTitle, searchByDirector);
+
+        return films.stream()
+                .map(this::fillFilmData)
+                .collect(Collectors.toList());
+    }
+
     public FilmDto findFilm(Long filmId) {
         log.debug(String.format("Поиск фильма с ID %d", filmId));
 

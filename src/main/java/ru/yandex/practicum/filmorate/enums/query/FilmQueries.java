@@ -11,6 +11,17 @@ public enum FilmQueries {
     			                    "LIMIT 10) AS liked_films ON f.id = liked_films.film_id " +
                         "ORDER BY liked_films.likes desc"),
 
+    SEARCH_FILMS_QUERY(
+            "SELECT f.*, COUNT(l.user_id) AS popularity " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "LEFT JOIN films_directors fd ON f.id = fd.film_id " +
+                    "LEFT JOIN directors d ON fd.director_id = d.id " +
+                    "%s " +
+                    "GROUP BY f.id " +
+                    "ORDER BY popularity DESC"
+    ),
+
     FIND_BY_ID_QUERY("SELECT * FROM films WHERE id = ?"),
 
     FIND_RATING_ID_QUERY("SELECT rating_id FROM films AS f WHERE id = ?"),

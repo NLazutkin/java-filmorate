@@ -1,3 +1,4 @@
+/*
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.AccessLevel;
@@ -133,3 +134,4 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.ofNullable(films.get(filmId)).isPresent();
     }
 }
+*/

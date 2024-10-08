@@ -17,8 +17,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 @Slf4j
 @Component("FilmDbStorage")
@@ -116,5 +118,30 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public boolean delete(Long filmId) {
         return delete(FilmQueries.DELETE_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector) {
+        String lowerQuery = "%" + query.toLowerCase() + "%";
+        List<Object> params = new ArrayList<>();
+        StringBuilder whereClause = new StringBuilder();
+
+        if (byTitle && byDirector) {
+            whereClause.append("WHERE LOWER(f.name) LIKE ? OR LOWER(d.name) LIKE ?");
+            params.add(lowerQuery);
+            params.add(lowerQuery);
+        } else if (byTitle) {
+            whereClause.append("WHERE LOWER(f.name) LIKE ?");
+            params.add(lowerQuery);
+        } else if (byDirector) {
+            whereClause.append("WHERE LOWER(d.name) LIKE ?");
+            params.add(lowerQuery);
+        }
+
+        String sql = String.format(FilmQueries.SEARCH_FILMS_QUERY.toString(), whereClause.toString());
+
+        log.debug("SQL запрос для поиска фильмов: {}", sql);
+
+        return findMany(sql, baseMapper, params.toArray());
     }
 }
