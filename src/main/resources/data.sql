@@ -2,6 +2,8 @@ SET REFERENTIAL_INTEGRITY FALSE;
 
 TRUNCATE TABLE FILMS_GENRES;
 
+TRUNCATE TABLE FILMS_DIRECTORS;
+
 TRUNCATE TABLE FRIENDS;
 
 TRUNCATE TABLE LIKES;
@@ -11,6 +13,8 @@ TRUNCATE TABLE FILMS RESTART IDENTITY;
 TRUNCATE TABLE USERS RESTART IDENTITY;
 
 TRUNCATE TABLE GENRES RESTART IDENTITY;
+
+TRUNCATE TABLE DIRECTORS RESTART IDENTITY;
 
 TRUNCATE TABLE RATINGS RESTART IDENTITY;
 
@@ -48,6 +52,13 @@ VALUES ('Capitan@yandex.ru', 'Capitan', 'Capitan', '2001-01-01'), 	-- 1
 		('Jack@yandex.ru', 'Jack', 'Jack', '2002-02-02'), 			-- 2
 		('Sparrow@yandex.ru', 'Sparrow', 'Sparrow', '2003-03-03'); 	-- 3
 
+INSERT INTO DIRECTORS (NAME)
+VALUES ('Джордж Лукас'), 	-- 1
+		('Фрэнк Дарабонт'), -- 2
+		('Рассел Малкэй'),	-- 3
+		('Пьер Коффан'),	-- 4
+		('Крис Рено');		-- 5
+
 INSERT INTO LIKES (FILM_ID, USER_ID)
 VALUES (1, 1), (1, 3),
 		(2, 1), (2, 2), (2, 3),
@@ -59,8 +70,14 @@ VALUES (1, 2, 1), (1, 3, 1),
 		(2, 1, 2),
 		(3, 1, 2), (3, 2, 1);
 
-INSERT INTO FILMS_GENRES (FILM_ID , GENRE_ID)
+INSERT INTO FILMS_GENRES (FILM_ID, GENRE_ID)
 VALUES (1, 2), (1, 4), (1, 6),
 		(2, 2), (2, 4), (2, 6),
 		(3, 1), (3, 2), (3, 4),
 		(4, 1), (4, 3), (4, 4), (4, 6);
+
+INSERT INTO FILMS_DIRECTORS (FILM_ID, DIRECTOR_ID)
+VALUES (1, 1), (1, 3),
+        (2, 1),
+        (3, 2),
+        (4, 4), (4, 5);

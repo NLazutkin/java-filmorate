@@ -27,5 +27,6 @@ public class Film {
     Long duration;
     LinkedHashSet<Long> likes = new LinkedHashSet<>();
     LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    LinkedHashSet<Director> directors = new LinkedHashSet<>();
     Mpa mpa;
 }
