@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 @Component("InMemoryDirectorStorage")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class InMemoryDirectorStorage implements DirectorStorage{
+public class InMemoryDirectorStorage implements DirectorStorage {
     Map<Long, Director> directors = new HashMap<>();
 
     public InMemoryDirectorStorage() {
