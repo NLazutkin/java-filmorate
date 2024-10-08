@@ -77,7 +77,6 @@ public class FilmServiceTest {
 
     @Test
     public void testSearchFilmsByDirector() {
-        // Arrange
         String query = "спилберг";
         String by = "director";
 
@@ -102,7 +101,6 @@ public class FilmServiceTest {
 
         Collection<FilmDto> result = filmService.searchFilms(query, by);
 
-        
         assertNotNull(result);
         assertEquals(2, result.size());
 
