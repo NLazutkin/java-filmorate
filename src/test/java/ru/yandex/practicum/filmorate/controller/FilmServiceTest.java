@@ -99,10 +99,10 @@ public class FilmServiceTest {
         when(filmStorage.findGenresIds(anyLong())).thenReturn(new LinkedHashSet<>());
         when(filmStorage.getLikes(anyLong())).thenReturn(new LinkedHashSet<>());
 
-        // Act
+
         Collection<FilmDto> result = filmService.searchFilms(query, by);
 
-        // Assert
+        
         assertNotNull(result);
         assertEquals(2, result.size());
 
