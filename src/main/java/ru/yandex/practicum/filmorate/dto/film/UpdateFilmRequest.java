@@ -53,7 +53,7 @@ public class UpdateFilmRequest {
     }
 
     public boolean hasDirectors() {
-        return this.genres != null;
+        return this.directors != null;
     }
 
     public boolean hasMpa() {

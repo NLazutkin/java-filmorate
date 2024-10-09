@@ -166,6 +166,21 @@ public class FilmService {
         Film updatedFilm = FilmMapper.updateFilmFields(filmStorage.findFilm(request.getId()), request);
         updatedFilm = filmStorage.update(updatedFilm);
 
+        Film finalUpdatedFilm = updatedFilm;
+        LinkedHashSet<Long> directorsIds = filmStorage.findDirectorsIds(updatedFilm.getId());
+        Collection<Director> directors = updatedFilm.getDirectors().stream()
+                .map(directorStorage::findDirector)
+                .filter(director -> !directorsIds.contains(director.getId()))
+                .peek(director -> filmStorage.addDirectorId(director, finalUpdatedFilm))
+                .toList();
+
+        LinkedHashSet<Long> genresIds = filmStorage.findGenresIds(updatedFilm.getId());
+        Collection<Genre> genres = updatedFilm.getGenres().stream()
+                .map(genreStorage::findGenre)
+                .filter(genre -> !genresIds.contains(genre.getId()))
+                .peek(genre -> filmStorage.addGenreId(genre, finalUpdatedFilm))
+                .toList();
+
         return FilmMapper.mapToFilmDto(updatedFilm);
     }
 
