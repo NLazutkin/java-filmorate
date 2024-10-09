@@ -31,4 +31,6 @@ public interface FilmStorage {
     Long findRatingId(Long filmId);
 
     LinkedHashSet<Long> getLikes(Long filmId);
+
+    Collection<Film> findUserFilms(Long userId);
 }
