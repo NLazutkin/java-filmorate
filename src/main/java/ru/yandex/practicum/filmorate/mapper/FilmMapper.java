@@ -84,6 +84,22 @@ public final class FilmMapper {
             film.setDuration(request.getDuration());
         }
 
+        if (request.hasLikes()) {
+            film.setLikes(request.getLikes());
+        }
+
+        if (request.hasGenres()) {
+            film.setGenres(request.getGenres());
+        }
+
+        if (request.hasDirectors()) {
+            film.setDirectors(request.getDirectors());
+        }
+
+        if (request.hasMpa()) {
+            film.setMpa(request.getMpa());
+        }
+
         return film;
     }
 }

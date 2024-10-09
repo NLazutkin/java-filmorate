@@ -30,33 +30,33 @@ public class DirectorService {
         this.directorStorage = genreStorage;
     }
 
-    public DirectorDto findGenre(Long genreId) {
+    public DirectorDto findDirector(Long genreId) {
         return DirectorMapper.mapToDirectorDto(directorStorage.findDirector(genreId));
     }
 
     public Collection<DirectorDto> findAll() {
-        log.debug("Получаем записи о всех жанрах");
+        log.debug("Получаем записи о всех режиссерах");
         return directorStorage.findAll().stream().map(DirectorMapper::mapToDirectorDto).collect(Collectors.toList());
     }
 
     public DirectorDto create(NewDirectorRequest request) {
-        log.debug("Создаем запись о жанре");
+        log.debug("Создаем запись о режиссере");
 
         if (directorStorage.isDirectorWithSameNameExist(request.getName())) {
-            throw new DuplicatedDataException(String.format("Жанр с именем \"%s\" уже существует", request.getName()));
+            throw new DuplicatedDataException(String.format("Режиссер с именем \"%s\" уже существует", request.getName()));
         }
 
-        Director mpa = DirectorMapper.mapToDirector(request);
-        mpa = directorStorage.create(mpa);
+        Director director = DirectorMapper.mapToDirector(request);
+        director = directorStorage.create(director);
 
-        return DirectorMapper.mapToDirectorDto(mpa);
+        return DirectorMapper.mapToDirectorDto(director);
     }
 
     public DirectorDto update(UpdateDirectorRequest request) {
-        log.debug("Обновляем данные о жанрах");
+        log.debug("Обновляем данные о режиссерах");
 
         if (request.getId() == null) {
-            throw new ValidationException("Id жанра должен быть указан");
+            throw new ValidationException("Id режиссера должен быть указан");
         }
 
         Director updatedGenre = DirectorMapper.updateDirectorFields(directorStorage.findDirector(request.getId()), request);

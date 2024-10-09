@@ -22,7 +22,7 @@ public class DirectorController {
 
     @GetMapping(directorPath)
     public DirectorDto findDirector(@PathVariable("id") Long genreId) {
-        return directorService.findGenre(genreId);
+        return directorService.findDirector(genreId);
     }
 
     @GetMapping
