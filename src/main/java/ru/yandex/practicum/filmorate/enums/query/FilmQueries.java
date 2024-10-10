@@ -8,7 +8,7 @@ public enum FilmQueries {
     			                    "FROM likes AS l " +
     			                    "GROUP BY l.film_id " +
                                     "ORDER BY count(l.user_id) desc " +
-    			                    "LIMIT 10) AS liked_films ON f.id = liked_films.film_id " +
+    			                    "LIMIT ?) AS liked_films ON f.id = liked_films.film_id " +
                         "ORDER BY liked_films.likes desc"),
 
     FIND_BY_ID_QUERY("SELECT * FROM films WHERE id = ?"),

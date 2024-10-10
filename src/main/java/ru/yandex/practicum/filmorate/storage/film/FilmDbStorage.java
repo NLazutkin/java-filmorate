@@ -45,7 +45,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> findPopular(Integer count) {
-        return findMany(FilmQueries.FIND_POPULAR_QUERY.toString(), baseMapper);
+        return findMany(FilmQueries.FIND_POPULAR_QUERY.toString(), baseMapper, count);
     }
 
     @Override

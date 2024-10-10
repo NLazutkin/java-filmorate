@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -18,13 +16,11 @@ import java.util.stream.Collectors;
 @Component("InMemoryFilmStorage")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryReviewStorage implements ReviewStorage {
-    Map<Long, Film> films = new HashMap<>();
-    Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
-    Map<Long, Long> filmsMpaId = new HashMap<>();
+    Map<Long, Review> reviews = new HashMap<>();
 
     // вспомогательный метод для генерации идентификатора нового поста
     private long getNextId() {
-        long currentMaxId = films.keySet()
+        long currentMaxId = reviews.keySet()
                 .stream()
                 .mapToLong(id -> id)
                 .max()
@@ -33,41 +29,41 @@ public class InMemoryReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public Collection<Film> findAll() {
-        return films.values();
+    public Collection<Review> findAll() {
+        return reviews.values();
     }
 
     @Override
-    public Film findFilm(Long filmId) {
-        return Optional.ofNullable(films.get(filmId))
-                .orElseThrow(() -> new NotFoundException(String.format("Фильм с ID %d не найден", filmId)));
+    public Review findReview(Long reviewId) {
+        return Optional.ofNullable(reviews.get(reviewId))
+                .orElseThrow(() -> new NotFoundException(String.format("Отзыв №%d не найден", reviewId)));
     }
 
     @Override
-    public Collection<Film> findPopular(Integer count) {
+    public Collection<Review> reviewsByFilmId(Long film_id, Integer count) {
         return findAll()
                 .stream()
-                .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
+                .sorted(Comparator.comparing((Review review) -> review.getLikes().size(), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void addLike(Film film, User user) {
-        if (film.getLikes().contains(user.getId())) {
-            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму %s",
-                    user.getName(), film.getName()));
+    public void addLike(Review review, User user, boolean isPositive) {
+        if (review.getLikes().contains(user.getId())) {
+            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму №%d",
+                    user.getName(), review.getId()));
         }
 
-        film.getLikes().add(user.getId());
+        review.getLikes().add(user.getId());
     }
 
-    public LinkedHashSet<Long> getLikes(Long filmId) {
-        Film film = films.get(filmId);
-        LinkedHashSet<Long> likes = film.getLikes();
+    public LinkedHashSet<Long> getLikes(Long reviewId) {
+        Review review = reviews.get(reviewId);
+        LinkedHashSet<Long> likes = review.getLikes();
 
         if (likes == null || likes.isEmpty()) {
-            log.trace(String.format("У фильма %s нет лайков", film.getName()));
+            log.trace(String.format("У отзыва %d нет лайков", review.getId()));
             return new LinkedHashSet<>();
         }
 
@@ -75,61 +71,35 @@ public class InMemoryReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public void deleteLike(Film film, User user) {
-        if (!film.getLikes().contains(user.getId())) {
-            throw new NotFoundException(String.format("Пользователь %s не ставил лайк фильму %s. Удалить лайк невозможно",
-                    user.getName(), film.getName()));
+    public void deleteLike(Review review, User user, boolean isPositive) {
+        if (!review.getLikes().contains(user.getId())) {
+            throw new NotFoundException(String.format("Пользователь %s не ставил лайк отзыву №%d. Удалить лайк невозможно",
+                    user.getName(), review.getId()));
         }
 
-        film.getLikes().remove(user.getId());
+        review.getLikes().remove(user.getId());
     }
 
     @Override
-    public void addGenreId(Genre genre, Film film) {
-        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(film.getId()));
-        LinkedHashSet<Long> genresIds = new LinkedHashSet<>();
-        if (filmGenresIds.isPresent()) {
-            genresIds = filmGenresIds.get();
-        }
-        genresIds.add(genre.getId());
-        filmsGenresIds.put(film.getId(), genresIds);
+    public Review create(Review review) {
+        review.setId(getNextId());
+        reviews.put(review.getId(), review);
+
+        return review;
     }
 
     @Override
-    public LinkedHashSet<Long> findGenresIds(Long filmId) {
-        LinkedHashSet<Long> genresIds = filmsGenresIds.get(filmId);
-        if (genresIds == null || genresIds.isEmpty()) {
-            return new LinkedHashSet<>();
-        }
-        return genresIds;
+    public Review update(Review newReview) {
+        reviews.put(newReview.getId(), newReview);
+        log.trace(String.format("Данные об отзыве %d обновлены!",  newReview.getId()));
+
+        return newReview;
     }
 
     @Override
-    public Long findRatingId(Long filmId) {
-        return Optional.ofNullable(filmsMpaId.get(filmId))
-                .orElseThrow(() -> new NotFoundException(String.format("Рейтинг для фильма с ID %d не найден", filmId)));
-    }
+    public boolean delete(Long reviewId) {
+        reviews.remove(reviewId);
 
-    @Override
-    public Film create(Film film) {
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-
-        filmsMpaId.put(film.getId(), film.getMpa().getId());
-        return film;
-    }
-
-    @Override
-    public Film update(Film newFilm) {
-        films.put(newFilm.getId(), newFilm);
-        filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
-        log.trace(String.format("Данные о фильме %s обновлены!",  newFilm.getName()));
-        return newFilm;
-    }
-
-    @Override
-    public boolean delete(Long filmId) {
-        films.remove(filmId);
-        return Optional.ofNullable(films.get(filmId)).isPresent();
+        return Optional.ofNullable(reviews.get(reviewId)).isPresent();
     }
 }

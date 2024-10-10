@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
+import java.util.LinkedHashSet;
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = {"id"})
@@ -21,4 +23,5 @@ public class Review {
     @Pattern(regexp = "^true$|^false$", message = "Может быть только true или false")
     boolean isPositive;
     Integer useful = 0;
+    LinkedHashSet<Long> likes = new LinkedHashSet<>();
 }

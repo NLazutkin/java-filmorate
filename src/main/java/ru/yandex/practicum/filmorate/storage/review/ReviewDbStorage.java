@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.query.ReviewQueries;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
@@ -33,27 +32,33 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     }
 
     @Override
-    public Film findFilm(Long filmId) {
-        return findOne(ReviewQueries.FIND_BY_ID_QUERY.toString(), baseMapper, filmId)
-                .orElseThrow(() -> new NotFoundException(String.format("Фильм c ID %d не найден", filmId)));
+    public Review findReview(Long reviewId) {
+        return findOne(ReviewQueries.FIND_BY_ID_QUERY.toString(), baseMapper, reviewId)
+                .orElseThrow(() -> new NotFoundException(String.format("Отзыв c ID %d не найден", reviewId)));
     }
 
     @Override
-    public Collection<Film> findAll() {
+    public Collection<Review> findAll() {
         return findMany(ReviewQueries.FIND_ALL_QUERY.toString(), baseMapper);
     }
 
     @Override
-    public Collection<Film> findPopular(Integer count) {
-        return findMany(ReviewQueries.FIND_POPULAR_QUERY.toString(), baseMapper);
+    public Collection<Review> reviewsByFilmId(Long film_id, Integer count) {
+        log.debug(String.format("Получаем список из %d отзывов фильма", count));
+
+        if (film_id == 0L) {
+            return findMany(ReviewQueries.FIND_N_REVIEWS_QUERY.toString(), baseMapper, count);
+        }
+
+        return findMany(ReviewQueries.FIND_REVIEWS_BY_FILM_QUERY.toString(), baseMapper, film_id, count);
     }
 
     @Override
-    public void addLike(Review review, User user) {
+    public void addLike(Review review, User user, boolean isPositive) {
         String errMsg = String.format("Пользователь %s не смог поставить лайк отзыву №%s", user.getName(), review.getId());
 
         try {
-            update(ReviewQueries.INSERT_LIKE_QUERY.toString(), errMsg, review.getId(), user.getId());
+            update(ReviewQueries.INSERT_LIKE_QUERY.toString(), errMsg, review.getId(), user.getId(), isPositive);
         } catch (SQLWarningException e) {
             throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк отзыву №%d. %s",
                     user.getName(), review.getId(), e.getSQLWarning()));
@@ -67,7 +72,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     }
 
     @Override
-    public void deleteLike(Review review, User user) {
+    public void deleteLike(Review review, User user, boolean isPositive) {
         try {
             delete(ReviewQueries.DELETE_LIKE_QUERY.toString(), review.getId(), user.getId());
         } catch (SQLWarningException e) {
@@ -77,11 +82,11 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     }
 
     @Override
-    public Film create(Review review) {
+    public Review create(Review review) {
         long id = insert(ReviewQueries.INSERT_REVIEW_QUERY.toString(), review.getUser_id(), review.getFilm_id(),
                 review.getContent(), review.isPositive(), review.getUseful());
-        film.setId(id);
-        return film;
+        review.setId(id);
+        return review;
     }
 
     @Override

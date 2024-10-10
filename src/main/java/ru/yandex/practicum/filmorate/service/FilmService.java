@@ -70,12 +70,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-
     public Collection<FilmDto> findPopular(Integer count) {
-        if (count <= 0) {
-            throw new ValidationException("Количество фильмов должно быть больше 0");
-        }
-
         log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
 
         return filmStorage.findPopular(count).stream()

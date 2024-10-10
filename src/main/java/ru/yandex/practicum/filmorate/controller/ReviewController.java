@@ -41,9 +41,11 @@ public class ReviewController {
         reviewService.deleteDislike(filmId, userId);
     }
 
-    @GetMapping("/popular")
-    public Collection<ReviewDto> findPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
-        return reviewService.findPopular(count);
+    GET /reviews?filmId={filmId}&count={count}
+    @GetMapping
+    public Collection<ReviewDto> reviewsByFilmId(@RequestParam(name = "filmId", defaultValue = "0") Long film_id,
+                                                 @RequestParam(name = "count", defaultValue = "10") Integer count) {
+        return reviewService.reviewsByFilmId(film_id, count);
     }
 
     @GetMapping("/{id}")
