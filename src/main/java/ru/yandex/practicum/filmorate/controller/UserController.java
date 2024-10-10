@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
@@ -64,5 +65,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable("id") Long userId) {
         return userService.delete(userId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public Collection<FilmDto> getRecommendedFilms(@PathVariable("id") Long userId) {
+        return userService.getRecommendedFilms(userId);
     }
 }

@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
@@ -76,6 +77,7 @@ public class FilmService {
                 .map(this::fillFilmData)
                 .collect(Collectors.toList());
     }
+
 
     public Collection<FilmDto> findPopular(Integer count) {
         if (count <= 0) {
@@ -205,5 +207,19 @@ public class FilmService {
                 .map(this::fillFilmData)
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .collect(Collectors.toList());
+    }
+
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        Collection<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId);
+
+        if (recommendedFilms.isEmpty()) {
+            log.debug("Для пользователя {} не найдено рекомендаций", userId);
+            return Collections.EMPTY_LIST;
+        } else {
+            log.debug("Для пользователя {} составлен список из {} фильмов(-a)", userId, recommendedFilms.size());
+            return recommendedFilms.stream()
+                    .map(this::fillFilmData)
+                    .collect(Collectors.toList());
+        }
     }
 }
