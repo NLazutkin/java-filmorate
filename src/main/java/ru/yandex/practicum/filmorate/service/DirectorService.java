@@ -26,12 +26,12 @@ public class DirectorService {
     DirectorStorage directorStorage;
 
     @Autowired
-    public DirectorService(@Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage genreStorage) {
-        this.directorStorage = genreStorage;
+    public DirectorService(@Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage directorStorage) {
+        this.directorStorage = directorStorage;
     }
 
-    public DirectorDto findDirector(Long genreId) {
-        return DirectorMapper.mapToDirectorDto(directorStorage.findDirector(genreId));
+    public DirectorDto findDirector(Long directorId) {
+        return DirectorMapper.mapToDirectorDto(directorStorage.findDirector(directorId));
     }
 
     public Collection<DirectorDto> findAll() {
@@ -59,10 +59,10 @@ public class DirectorService {
             throw new ValidationException("Id режиссера должен быть указан");
         }
 
-        Director updatedGenre = DirectorMapper.updateDirectorFields(directorStorage.findDirector(request.getId()), request);
-        updatedGenre = directorStorage.update(updatedGenre);
+        Director updatedDirector = DirectorMapper.updateDirectorFields(directorStorage.findDirector(request.getId()), request);
+        updatedDirector = directorStorage.update(updatedDirector);
 
-        return DirectorMapper.mapToDirectorDto(updatedGenre);
+        return DirectorMapper.mapToDirectorDto(updatedDirector);
     }
 
     public boolean delete(Long directorId) {

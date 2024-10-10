@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.query.DirectorQueries;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
@@ -36,7 +36,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     @Override
     public Director findDirector(Director director) {
         return findOne(DirectorQueries.FIND_BY_ID_QUERY.toString(), baseMapper, director.getId())
-                .orElseThrow(() -> new GenreNotFoundException(String.format("В запросе не корректный режиссер с ID %d", director.getId())));
+                .orElseThrow(() -> new DirectorNotFoundException(String.format("В запросе не корректный режиссер с ID %d", director.getId())));
     }
 
     @Override

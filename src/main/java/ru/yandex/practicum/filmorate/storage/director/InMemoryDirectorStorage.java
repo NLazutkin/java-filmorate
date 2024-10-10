@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 
@@ -39,7 +39,7 @@ public class InMemoryDirectorStorage implements DirectorStorage {
 
     @Override
     public boolean isDirectorWithSameNameExist(String name) {
-        return directors.values().stream().anyMatch(genreFromMemory -> genreFromMemory.getName().equals(name));
+        return directors.values().stream().anyMatch(directorFromMemory -> directorFromMemory.getName().equals(name));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class InMemoryDirectorStorage implements DirectorStorage {
     @Override
     public Director findDirector(Director director) {
         return Optional.ofNullable(directors.get(director.getId()))
-                .orElseThrow(() -> new GenreNotFoundException(String.format("В запросе не корректный режиссер с ID %d", director.getId())));
+                .orElseThrow(() -> new DirectorNotFoundException(String.format("В запросе не корректный режиссер с ID %d", director.getId())));
     }
 
     @Override
