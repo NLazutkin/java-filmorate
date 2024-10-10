@@ -76,14 +76,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findUserFilms(Long userId) {
-        Collection<Film> films = findAll();
-        Collection<Film> userFilms = new ArrayList<>();
-        for (Film film : films) {
-            if (film.getLikes().contains(userId)) {
-                userFilms.add(film);
-            }
-        }
-        return userFilms;
+        return findAll().stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .collect(Collectors.toList());
     }
 
     @Override

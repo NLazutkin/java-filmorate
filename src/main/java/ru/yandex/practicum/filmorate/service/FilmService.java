@@ -144,17 +144,17 @@ public class FilmService {
 
     public Collection<FilmDto> findCommonFilms(Long userId, Long friendId) {
         log.debug("Получаем список общих фильмов пользователей с сортировкой по популярности");
-        Collection<FilmDto> filmsUser = filmStorage.findUserFilms(userId).stream()
-                                        .map(this::fillFilmData)
-                                        .collect(Collectors.toList());
 
-        Collection<FilmDto> filmsFriend = filmStorage.findUserFilms(friendId).stream()
-                                            .map(this::fillFilmData)
-                                            .collect(Collectors.toList());
+        User user = userStorage.findUser(userId);
+        User friend = userStorage.findUser(friendId);
+
+        Collection<Film> filmsUser = filmStorage.findUserFilms(user.getId());
+        Collection<Film> filmsFriend = filmStorage.findUserFilms(friend.getId());
 
         filmsUser.retainAll(filmsFriend);
 
         return filmsUser.stream()
+                .map(this::fillFilmData)
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .collect(Collectors.toList());
     }

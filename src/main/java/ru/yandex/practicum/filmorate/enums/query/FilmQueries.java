@@ -20,11 +20,9 @@ public enum FilmQueries {
     FIND_LIKES_BY_ID_QUERY("SELECT user_id FROM likes WHERE film_id = ?"),
 
     FIND_USER_FILMS_QUERY("SELECT f.* FROM films f " +
-                            "RIGHT JOIN likes l ON l.film_id = f.id " +
-                            "WHERE f.id IN (SELECT film_id " +
-                                            "FROM likes " +
-                                            "WHERE user_id = ?) " +
-                            "GROUP BY f.id"),
+                                "INNER JOIN likes l ON f.id = l.film_id " +
+                                "INNER JOIN users u ON u.id = l.user_id " +
+                                "WHERE u.id = ?"),
 
     INSERT_FILM_QUERY("INSERT INTO films(name, description, releaseDate, duration, rating_id)VALUES (?, ?, ?, ?, ?)"),
 
