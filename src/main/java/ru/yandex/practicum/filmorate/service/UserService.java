@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.Pair;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
@@ -24,10 +25,13 @@ import java.util.stream.Collectors;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService {
     UserStorage userStorage;
+    FilmService filmService;
 
     @Autowired
-    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage,
+                       FilmService filmService) {
         this.userStorage = userStorage;
+        this.filmService = filmService;
     }
 
     public UserDto findUser(Long userId) {
@@ -106,5 +110,11 @@ public class UserService {
         User user = userStorage.findUser(filmId);
         log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
         return userStorage.delete(filmId);
+    }
+
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        User user = userStorage.findUser(userId);
+        log.debug("Запрашиваем рекомендации фильмов для пользователя {}", userId);
+        return filmService.getRecommendedFilms(userId);
     }
 }
