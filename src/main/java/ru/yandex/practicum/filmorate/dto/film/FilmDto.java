@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
@@ -22,5 +23,6 @@ public class FilmDto {
     Long duration;
     LinkedHashSet<Long> likes = new LinkedHashSet<>();
     LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    LinkedHashSet<Director> directors = new LinkedHashSet<>();
     MpaDto mpa;
 }

@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.*;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -59,5 +57,16 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable("id") Long filmId) {
         return filmService.delete(filmId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<FilmDto> findDirectorFilms(@PathVariable("directorId") Long directorId,
+                                                 @RequestParam(name = "sortBy", defaultValue = "") String sortConditions) {
+        return filmService.findDirectorFilms(directorId, sortConditions);
+    }
+
+    @GetMapping("/common")
+    public Collection<FilmDto> findCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.findCommonFilms(userId, friendId);
     }
 }

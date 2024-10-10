@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS films (
   description VARCHAR(200),
   releaseDate DATE,
   duration INTEGER,
-  rating_id INTEGER
+  rating_id BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -50,6 +50,17 @@ CREATE TABLE IF NOT EXISTS friends (
   PRIMARY KEY (user_id, friend_id)
 );
 
+CREATE TABLE IF NOT EXISTS directors (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS films_directors (
+  film_id BIGINT NOT NULL,
+  director_id BIGINT NOT NULL,
+  PRIMARY KEY (film_id, director_id)
+);
+
 CREATE TABLE IF NOT EXISTS reviews (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id BIGINT NOT NULL,
@@ -81,6 +92,10 @@ ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CA
 ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE friends ADD FOREIGN KEY (status_id) REFERENCES statuses (id);
+
+ALTER TABLE films_directors ADD FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE;
+
+ALTER TABLE films_directors ADD FOREIGN KEY (director_id) REFERENCES directors (id);
 
 ALTER TABLE reviews ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 
