@@ -38,6 +38,11 @@ public enum FilmQueries {
 
     FIND_LIKES_BY_ID_QUERY("SELECT user_id FROM likes WHERE film_id = ?"),
 
+    FIND_USER_FILMS_QUERY("SELECT f.* FROM films f " +
+                                "INNER JOIN likes l ON f.id = l.film_id " +
+                                "INNER JOIN users u ON u.id = l.user_id " +
+                                "WHERE u.id = ?"),
+
     INSERT_FILM_QUERY("INSERT INTO films(name, description, releaseDate, duration, rating_id)VALUES (?, ?, ?, ?, ?)"),
 
     INSERT_LIKE_QUERY("INSERT INTO likes(film_id, user_id)VALUES (?, ?)"),
