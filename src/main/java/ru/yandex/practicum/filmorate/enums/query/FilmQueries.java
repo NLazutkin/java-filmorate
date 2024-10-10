@@ -11,11 +11,30 @@ public enum FilmQueries {
     			                    "LIMIT 10) AS liked_films ON f.id = liked_films.film_id " +
                         "ORDER BY liked_films.likes desc"),
 
+    FIND_DIRECTOR_FILMS_QUERY("SELECT f.* FROM films_directors AS fd " +
+            "LEFT JOIN films AS f ON fd.film_id = f.id " +
+            "WHERE fd.director_id = ? "),
+
+    FIND_DIRECTOR_FILMS_ORDER_YEAR_QUERY("SELECT f.* FROM films_directors AS fd " +
+            "LEFT JOIN films AS f ON fd.film_id = f.id " +
+            "WHERE fd.director_id = ? " +
+            "ORDER BY EXTRACT(YEAR FROM f.releaseDate)"),
+
+    FIND_DIRECTOR_FILMS_ORDER_LIKES_QUERY("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id " +
+            "FROM films_directors AS fd " +
+            "LEFT JOIN films AS f ON fd.film_id = f.id " +
+            "LEFT JOIN likes AS l ON l.film_id = f.id " +
+            "WHERE fd.director_id = ? " +
+            "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id " +
+            "ORDER BY COUNT(l.user_id) DESC"),
+
     FIND_BY_ID_QUERY("SELECT * FROM films WHERE id = ?"),
 
     FIND_RATING_ID_QUERY("SELECT rating_id FROM films AS f WHERE id = ?"),
 
     FIND_GENRE_ID_QUERY("SELECT genre_id FROM films_genres WHERE film_id = ?"),
+
+    FIND_DIRECTOR_ID_QUERY("SELECT director_id FROM films_directors WHERE film_id = ?"),
 
     FIND_LIKES_BY_ID_QUERY("SELECT user_id FROM likes WHERE film_id = ?"),
 
@@ -29,6 +48,8 @@ public enum FilmQueries {
     INSERT_LIKE_QUERY("INSERT INTO likes(film_id, user_id)VALUES (?, ?)"),
 
     INSERT_FILM_GENRE_QUERY("INSERT INTO films_genres(film_id, genre_id)VALUES (?, ?)"),
+
+    INSERT_FILM_DIRECTOR_QUERY("INSERT INTO films_directors(film_id, director_id)VALUES (?, ?)"),
 
     UPDATE_QUERY("UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ? WHERE id = ?"),
 
@@ -47,4 +68,3 @@ public enum FilmQueries {
         return this.query;
     }
 }
-

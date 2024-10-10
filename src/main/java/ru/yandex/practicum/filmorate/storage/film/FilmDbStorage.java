@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.query.FilmQueries;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
@@ -46,6 +47,21 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Collection<Film> findPopular(Integer count) {
         return findMany(FilmQueries.FIND_POPULAR_QUERY.toString(), baseMapper);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilms(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_QUERY.toString(), baseMapper, directorId);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderYear(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_ORDER_YEAR_QUERY.toString(), baseMapper, directorId);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderLikes(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_ORDER_LIKES_QUERY.toString(), baseMapper, directorId);
     }
 
     @Override
@@ -88,6 +104,18 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
+    public void addDirectorId(Director director, Film film) {
+        String errMsg = String.format("Для фильма %s не удалось установить режиссера %s", film.getName(), director.getName());
+
+        try {
+            update(FilmQueries.INSERT_FILM_DIRECTOR_QUERY.toString(), errMsg, film.getId(), director.getId());
+        } catch (SQLWarningException e) {
+            throw new DuplicatedDataException(String.format("Для фильма %s режиссер %s уже установлен. %s",
+                    film.getName(), director.getName(), e.getSQLWarning()));
+        }
+    }
+
+    @Override
     public Long findRatingId(Long filmId) {
         return findId(FilmQueries.FIND_RATING_ID_QUERY.toString(), filmId);
     }
@@ -96,6 +124,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public LinkedHashSet<Long> findGenresIds(Long filmId) {
         return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_GENRE_ID_QUERY.toString(),
                 (rs, rowNum) -> rs.getLong("genre_id"), filmId));
+    }
+
+    @Override
+    public LinkedHashSet<Long> findDirectorsIds(Long filmId) {
+        return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_DIRECTOR_ID_QUERY.toString(),
+                (rs, rowNum) -> rs.getLong("director_id"), filmId));
     }
 
     @Override

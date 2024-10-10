@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class InMemoryFilmStorage implements FilmStorage {
     Map<Long, Film> films = new HashMap<>();
     Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
+    Map<Long, LinkedHashSet<Long>> filmsDirectorsIds = new HashMap<>();
     Map<Long, Long> filmsMpaId = new HashMap<>();
 
     // вспомогательный метод для генерации идентификатора нового поста
@@ -50,6 +52,38 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilms(Long directorId) {
+        return filmsDirectorsIds.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().contains(directorId))
+                .map(Map.Entry::getKey)
+                .map(films::get)
+                .toList();
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderYear(Long directorId) {
+        return filmsDirectorsIds.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().contains(directorId))
+                .map(Map.Entry::getKey)
+                .map(films::get)
+                .sorted(Comparator.comparing(Film::getReleaseDate, Comparator.naturalOrder()))
+                .toList();
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderLikes(Long directorId) {
+        return filmsDirectorsIds.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().contains(directorId))
+                .map(Map.Entry::getKey)
+                .map(films::get)
+                .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
+                .toList();
     }
 
     @Override
@@ -103,12 +137,32 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void addDirectorId(Director director, Film film) {
+        Optional<LinkedHashSet<Long>> filmDirectorsIds = Optional.ofNullable(filmsDirectorsIds.get(film.getId()));
+        LinkedHashSet<Long> directorsIds = new LinkedHashSet<>();
+        if (filmDirectorsIds.isPresent()) {
+            directorsIds = filmDirectorsIds.get();
+        }
+        directorsIds.add(director.getId());
+        filmsDirectorsIds.put(film.getId(), directorsIds);
+    }
+
+    @Override
     public LinkedHashSet<Long> findGenresIds(Long filmId) {
         LinkedHashSet<Long> genresIds = filmsGenresIds.get(filmId);
         if (genresIds == null || genresIds.isEmpty()) {
             return new LinkedHashSet<>();
         }
         return genresIds;
+    }
+
+    @Override
+    public LinkedHashSet<Long> findDirectorsIds(Long filmId) {
+        LinkedHashSet<Long> directorsIds = filmsDirectorsIds.get(filmId);
+        if (directorsIds == null || directorsIds.isEmpty()) {
+            return new LinkedHashSet<>();
+        }
+        return directorsIds;
     }
 
     @Override
