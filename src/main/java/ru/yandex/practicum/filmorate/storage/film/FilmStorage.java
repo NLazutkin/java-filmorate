@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 public interface FilmStorage {
     Film findFilm(Long filmId);
