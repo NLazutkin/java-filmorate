@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
@@ -18,6 +19,12 @@ public interface FilmStorage {
 
     Collection<Film> findPopular(Integer count);
 
+    Collection<Film> findDirectorFilms(Long directorId);
+
+    Collection<Film> findDirectorFilmsOrderYear(Long directorId);
+
+    Collection<Film> findDirectorFilmsOrderLikes(Long directorId);
+
     boolean delete(Long filmId);
 
     void addLike(Film film, User user);
@@ -26,11 +33,18 @@ public interface FilmStorage {
 
     void addGenreId(Genre genre, Film film);
 
+    void addDirectorId(Director director, Film film);
+
     LinkedHashSet<Long> findGenresIds(Long filmId);
+
+    LinkedHashSet<Long> findDirectorsIds(Long filmId);
 
     Long findRatingId(Long filmId);
 
     LinkedHashSet<Long> getLikes(Long filmId);
 
     Collection<Film> getRecommendedFilms(Long userId);
+}
+
+    Collection<Film> findUserFilms(Long userId);
 }
