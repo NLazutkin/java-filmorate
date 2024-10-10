@@ -4,7 +4,7 @@ public enum FilmQueries {
     FIND_ALL_QUERY("SELECT * FROM films"),
 
     FIND_POPULAR_QUERY("SELECT f.* FROM films AS f " +
-                        "INNER JOIN (SELECT film_id, count(l.user_id) likes " +
+                        "LEFT JOIN (SELECT film_id, count(l.user_id) likes " +
     			                    "FROM likes AS l " +
     			                    "GROUP BY l.film_id " +
                                     "ORDER BY count(l.user_id) desc " +
