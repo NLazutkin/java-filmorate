@@ -132,4 +132,37 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.remove(filmId);
         return Optional.ofNullable(films.get(filmId)).isPresent();
     }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        // фильмы, лайкнутые целевым юзером
+        Set<Long> likedFilmsByUser = films.values().stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .map(Film::getId)
+                .collect(Collectors.toSet());
+
+        // юзер с наибольшим кол-вом пересечений
+        Long mostSimilarUserId = films.values().stream()
+                .flatMap(film -> film.getLikes().stream())
+                .filter(otherUserId -> !otherUserId.equals(userId))
+                .distinct()
+                .map(otherUserId -> Map.entry(
+                        otherUserId,
+                        films.values().stream()
+                                .filter(film -> film.getLikes().contains(otherUserId)
+                                        && likedFilmsByUser.contains(film.getId()))
+                                .count()
+                ))
+                .max(Comparator.comparingLong(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        if (mostSimilarUserId == null) {
+            return Collections.emptyList();
+        }
+
+        return films.values().stream()
+                .filter(film -> film.getLikes().contains(mostSimilarUserId) && !likedFilmsByUser.contains(film.getId()))
+                .collect(Collectors.toList());
+    }
 }
