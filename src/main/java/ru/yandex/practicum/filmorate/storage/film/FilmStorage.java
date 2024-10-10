@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 public interface FilmStorage {
     Film findFilm(Long filmId);
@@ -44,4 +45,6 @@ public interface FilmStorage {
     LinkedHashSet<Long> getLikes(Long filmId);
 
     Collection<Film> findUserFilms(Long userId);
+
+    Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector);
 }

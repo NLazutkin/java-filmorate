@@ -206,4 +206,40 @@ public class FilmService {
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .collect(Collectors.toList());
     }
+
+    public Collection<FilmDto> searchFilms(String query, String by) {
+        log.debug("Поиск фильмов по запросу '{}' по полям '{}'", query, by);
+
+        if (query == null || query.isBlank()) {
+            throw new ValidationException("Параметр 'query' не должен быть пустым");
+        }
+        if (by == null || by.isBlank()) {
+            throw new ValidationException("Параметр 'by' не должен быть пустым");
+        }
+
+        String[] byParams = by.split(",");
+        boolean searchByTitle = false;
+        boolean searchByDirector = false;
+
+        for (String param : byParams) {
+            String trimmedParam = param.trim().toLowerCase();
+            if (trimmedParam.equals("title")) {
+                searchByTitle = true;
+            } else if (trimmedParam.equals("director")) {
+                searchByDirector = true;
+            } else {
+                throw new ValidationException("Недопустимое значение параметра 'by': " + param);
+            }
+        }
+
+        if (!searchByTitle && !searchByDirector) {
+            throw new ValidationException("Параметр 'by' должен содержать 'title' или 'director'");
+        }
+
+        Collection<Film> films = filmStorage.searchFilms(query, searchByTitle, searchByDirector);
+
+        return films.stream()
+                .map(this::fillFilmData)
+                .collect(Collectors.toList());
+    }
 }

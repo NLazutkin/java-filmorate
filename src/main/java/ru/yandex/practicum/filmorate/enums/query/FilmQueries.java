@@ -28,6 +28,15 @@ public enum FilmQueries {
             "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id " +
             "ORDER BY COUNT(l.user_id) DESC"),
 
+    SEARCH_FILMS_QUERY(
+            "SELECT f.*, COUNT(l.user_id) AS popularity " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "%s " +
+                    "GROUP BY f.id " +
+                    "ORDER BY popularity DESC"
+    ),
+
     FIND_BY_ID_QUERY("SELECT * FROM films WHERE id = ?"),
 
     FIND_RATING_ID_QUERY("SELECT rating_id FROM films AS f WHERE id = ?"),
