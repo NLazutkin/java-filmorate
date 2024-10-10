@@ -75,6 +75,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Collection<Film> findUserFilms(Long userId) {
+        return findAll().stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteLike(Film film, User user) {
         if (!film.getLikes().contains(user.getId())) {
             throw new NotFoundException(String.format("Пользователь %s не ставил лайк фильму %s. Удалить лайк невозможно",

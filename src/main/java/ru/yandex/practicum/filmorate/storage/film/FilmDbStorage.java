@@ -117,4 +117,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public boolean delete(Long filmId) {
         return delete(FilmQueries.DELETE_QUERY.toString(), filmId);
     }
+
+    public Collection<Film> findUserFilms(Long userId) {
+        return findMany(FilmQueries.FIND_USER_FILMS_QUERY.toString(), baseMapper, userId);
+    }
 }

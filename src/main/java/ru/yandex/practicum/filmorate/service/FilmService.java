@@ -17,8 +17,7 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -141,5 +140,22 @@ public class FilmService {
         Film film = filmStorage.findFilm(filmId);
         log.debug("Удаляем данные фильма " + film.getName());
         return filmStorage.delete(filmId);
+    }
+
+    public Collection<FilmDto> findCommonFilms(Long userId, Long friendId) {
+        log.debug("Получаем список общих фильмов пользователей с сортировкой по популярности");
+
+        User user = userStorage.findUser(userId);
+        User friend = userStorage.findUser(friendId);
+
+        Collection<Film> filmsUser = filmStorage.findUserFilms(user.getId());
+        Collection<Film> filmsFriend = filmStorage.findUserFilms(friend.getId());
+
+        filmsUser.retainAll(filmsFriend);
+
+        return filmsUser.stream()
+                .map(this::fillFilmData)
+                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
+                .collect(Collectors.toList());
     }
 }

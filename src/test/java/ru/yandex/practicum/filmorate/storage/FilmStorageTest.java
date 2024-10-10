@@ -194,4 +194,14 @@ class FilmStorageTest {
     public void testDeleteFilm() {
         assertThat(filmStorage.delete(4L)).isTrue();
     }
+
+    @Test
+    public void testFindUserFilms() {
+        User user = new User();
+        user.setId(3L);
+
+        assertThat(filmStorage.findUserFilms(user.getId())).isNotEmpty()
+                .hasSize(3)
+                .isInstanceOf(Collection.class);
+    }
 }
