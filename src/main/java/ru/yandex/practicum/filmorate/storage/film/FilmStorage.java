@@ -44,7 +44,6 @@ public interface FilmStorage {
     LinkedHashSet<Long> getLikes(Long filmId);
 
     Collection<Film> getRecommendedFilms(Long userId);
-}
 
     Collection<Film> findUserFilms(Long userId);
 }

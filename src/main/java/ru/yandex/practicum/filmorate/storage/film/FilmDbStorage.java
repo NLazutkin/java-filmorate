@@ -19,7 +19,10 @@ import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("FilmDbStorage")

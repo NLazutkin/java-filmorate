@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class FilmService {
     UserStorage userStorage;
     MpaStorage mpaStorage;
     GenreStorage genreStorage;
+    DirectorStorage directorStorage;
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
