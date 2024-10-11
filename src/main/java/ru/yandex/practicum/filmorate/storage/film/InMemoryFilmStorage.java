@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     Map<Long, LinkedHashSet<Long>> filmsDirectorsIds = new HashMap<>();
     Map<Long, Long> filmsMpaId = new HashMap<>();
 
-    // вспомогательный метод для генерации идентификатора нового поста
+    // вспомогательный метод  генерации идентификатора нового  поста
     private long getNextId() {
         long currentMaxId = films.keySet()
                 .stream()
@@ -184,7 +184,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film update(Film newFilm) {
         films.put(newFilm.getId(), newFilm);
         filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
-        log.trace(String.format("Данные о фильме %s обновлены!",  newFilm.getName()));
+        log.trace(String.format("Данные о фильме %s обновлены!", newFilm.getName()));
         return newFilm;
     }
 
@@ -195,6 +195,38 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector) {
+        String lowerQuery = query.toLowerCase();
+
+        return films.values().stream()
+                .filter(film -> {
+                    boolean matchesTitle = false;
+                    boolean matchesDirector = false;
+
+                    if (byTitle) {
+                        matchesTitle = film.getName().toLowerCase().contains(lowerQuery);
+                    }
+
+                    if (byDirector) {
+                        LinkedHashSet<Long> directorIds = findDirectorsIds(film.getId());
+                        for (Long directorId : directorIds) {
+                            Director director = film.getDirectors().stream()
+                                    .filter(d -> d.getId().equals(directorId))
+                                    .findFirst()
+                                    .orElse(null);
+                            if (director != null && director.getName().toLowerCase().contains(lowerQuery)) {
+                                matchesDirector = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    return matchesTitle || matchesDirector;
+                })
+                .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+    }
+
     public Collection<Film> getRecommendedFilms(Long userId) {
         // фильмы, лайкнутые целевым юзером
         Set<Long> likedFilmsByUser = films.values().stream()

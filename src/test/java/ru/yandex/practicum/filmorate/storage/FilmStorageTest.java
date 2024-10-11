@@ -15,7 +15,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+
 import java.util.Collection;
+
 import java.util.LinkedHashSet;
 
 @JdbcTest
@@ -259,4 +261,5 @@ class FilmStorageTest {
                 .hasSize(3)
                 .isInstanceOf(Collection.class);
     }
+
 }

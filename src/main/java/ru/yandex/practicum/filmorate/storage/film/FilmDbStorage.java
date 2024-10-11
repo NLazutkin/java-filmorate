@@ -18,10 +18,12 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -153,6 +155,51 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public boolean delete(Long filmId) {
         return delete(FilmQueries.DELETE_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector) {
+        String lowerQuery = "%" + query.toLowerCase() + "%";
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT f.*, COUNT(l.user_id) AS popularity " +
+                        "FROM films f " +
+                        "LEFT JOIN likes l ON f.id = l.film_id "
+        );
+
+        if (byDirector) {
+            sql.append(
+                    "LEFT JOIN films_directors fd ON f.id = fd.film_id " +
+                            "LEFT JOIN directors d ON fd.director_id = d.id "
+            );
+        }
+
+        sql.append("WHERE ");
+
+        if (byTitle && byDirector) {
+            sql.append("(LOWER(f.name) LIKE ? OR LOWER(d.name) LIKE ?) ");
+            params.add(lowerQuery);
+            params.add(lowerQuery);
+        } else if (byTitle) {
+            sql.append("LOWER(f.name) LIKE ? ");
+            params.add(lowerQuery);
+        } else if (byDirector) {
+            sql.append("LOWER(d.name) LIKE ? ");
+            params.add(lowerQuery);
+        } else {
+            sql.append("LOWER(f.name) LIKE ? ");
+            params.add(lowerQuery);
+        }
+
+        sql.append(
+                "GROUP BY f.id " +
+                        "ORDER BY popularity DESC"
+        );
+
+        String finalSql = sql.toString();
+        log.debug("SQL запрос для поиска фильмов: {}", finalSql);
+
+        return findMany(finalSql, baseMapper, params.toArray());
     }
 
     public Collection<Film> findUserFilms(Long userId) {
