@@ -55,7 +55,17 @@ public enum FilmQueries {
 
     DELETE_QUERY("DELETE FROM films WHERE id = ?"),
 
-    DELETE_LIKE_QUERY("DELETE FROM likes WHERE film_id = ? AND user_id = ?");
+    DELETE_LIKE_QUERY("DELETE FROM likes WHERE film_id = ? AND user_id = ?"),
+
+    FIND_LIKED_FILMS_BY_USER_ID_QUERY("SELECT film_id FROM likes WHERE user_id = ?"),
+
+    FIND_MOST_SIMILAR_USER("SELECT user_id, COUNT(*) AS common_likes " +
+            "FROM likes " +
+            "WHERE film_id IN (SELECT film_id FROM likes WHERE user_id = ?) " +
+            "AND user_id NOT IN (?) " +
+            "GROUP BY user_id " +
+            "ORDER BY common_likes DESC " +
+            "LIMIT 1");
 
     private final String query;
 

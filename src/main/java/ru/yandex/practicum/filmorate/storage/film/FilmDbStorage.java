@@ -19,7 +19,10 @@ import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("FilmDbStorage")
@@ -154,5 +157,37 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     public Collection<Film> findUserFilms(Long userId) {
         return findMany(FilmQueries.FIND_USER_FILMS_QUERY.toString(), baseMapper, userId);
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        Collection<Long> likedFilms = getFilmsLikedByUser(userId);
+        Long similarUser = findMostSimilarUser(userId, likedFilms);
+
+        if (similarUser == null) {
+            return Collections.emptyList();
+        }
+
+        Collection<Long> recommendedFilmsIds = getFilmsLikedByUser(similarUser);
+        recommendedFilmsIds.removeAll(likedFilms);
+
+        return recommendedFilmsIds.stream()
+                .map(this::findFilm)
+                .collect(Collectors.toList());
+    }
+
+    private Collection<Long> getFilmsLikedByUser(Long userId) {
+        return new HashSet<>(jdbc.queryForList(FilmQueries.FIND_LIKED_FILMS_BY_USER_ID_QUERY.toString(),
+                Long.class, userId));
+    }
+
+    private Long findMostSimilarUser(Long userId, Collection<Long> filmsLikedByUser) {
+        return jdbc.query(FilmQueries.FIND_MOST_SIMILAR_USER.toString(), rs -> {
+            if (rs.next()) {
+                return rs.getLong("user_id");
+            } else {
+                return null;
+            }
+        }, userId, userId);
     }
 }

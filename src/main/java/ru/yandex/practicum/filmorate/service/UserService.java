@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.Pair;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -24,10 +27,15 @@ import java.util.stream.Collectors;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService {
     UserStorage userStorage;
+    FilmStorage filmStorage;
+    FilmService filmService;
 
     @Autowired
-    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage,
+                       @Qualifier("FilmDbStorage") FilmStorage filmStorage, FilmService filmService) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+        this.filmService = filmService;
     }
 
     public UserDto findUser(Long userId) {
@@ -106,5 +114,21 @@ public class UserService {
         User user = userStorage.findUser(filmId);
         log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
         return userStorage.delete(filmId);
+    }
+
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        User user = userStorage.findUser(userId);
+        log.debug("Запрашиваем рекомендации фильмов для пользователя {}", userId);
+        Collection<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId);
+
+        if (recommendedFilms.isEmpty()) {
+            log.debug("Для пользователя {} не найдено рекомендаций", userId);
+            return Collections.EMPTY_LIST;
+        } else {
+            log.debug("Для пользователя {} составлен список из {} фильмов(-a)", userId, recommendedFilms.size());
+            return recommendedFilms.stream()
+                    .map(filmService::fillFilmData)
+                    .collect(Collectors.toList());
+        }
     }
 }
