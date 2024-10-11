@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     Map<Long, LinkedHashSet<Long>> filmsDirectorsIds = new HashMap<>();
     Map<Long, Long> filmsMpaId = new HashMap<>();
 
-    // вспомогательный метод для генерации идентификатора нового  поста
+    // вспомогательный метод  генерации идентификатора нового  поста
     private long getNextId() {
         long currentMaxId = films.keySet()
                 .stream()
