@@ -50,6 +50,21 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
+    public Collection<Film> findPopularByYear(Integer count, Integer year) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_YEAR_QUERY.toString(), baseMapper, year, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenre(Integer count, Long genreId) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_GENRE_QUERY.toString(), baseMapper, genreId, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenreAndYear(Integer count, Long genreId, Integer year) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_GENRE_AND_YEAR_QUERY.toString(), baseMapper, genreId, year, count);
+    }
+
+    @Override
     public Collection<Film> findDirectorFilms(Long directorId) {
         return findMany(FilmQueries.FIND_DIRECTOR_FILMS_QUERY.toString(), baseMapper, directorId);
     }

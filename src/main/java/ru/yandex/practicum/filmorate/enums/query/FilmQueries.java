@@ -11,6 +11,35 @@ public enum FilmQueries {
     			                    "LIMIT 10) AS liked_films ON f.id = liked_films.film_id " +
                         "ORDER BY liked_films.likes desc"),
 
+    FIND_POPULAR_BY_YEAR_QUERY("SELECT f.* FROM films AS f " +
+                            "LEFT JOIN (SELECT film_id, count(l.user_id) likes " +
+                                        "FROM likes AS l " +
+                                        "GROUP BY l.film_id " +
+                                        "ORDER BY count(l.user_id) desc) AS liked_films ON f.id = liked_films.film_id " +
+                            "WHERE EXTRACT(YEAR FROM CAST(releaseDate AS date)) = ? " +
+                            "ORDER BY liked_films.likes DESC " +
+                            "LIMIT ?"),
+
+    FIND_POPULAR_BY_GENRE_QUERY("SELECT f.* FROM films f " +
+                                "LEFT JOIN (SELECT l.film_id, count(l.user_id) likes FROM likes l " +
+                                            "GROUP BY l.film_id " +
+                                            "ORDER BY count(l.user_id) desc) liked_films ON f.id = liked_films.film_id " +
+                                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                                "WHERE fg.genre_id = ? " +
+                                "GROUP BY f.id " +
+                                "ORDER BY liked_films.likes desc " +
+                                "LIMIT ?"),
+
+    FIND_POPULAR_BY_GENRE_AND_YEAR_QUERY("SELECT f.* FROM films f " +
+                                        "LEFT JOIN (SELECT l.film_id, count(l.user_id) likes FROM likes l " +
+                                                    "GROUP BY l.film_id " +
+                                                    "ORDER BY count(l.user_id) desc) liked_films ON f.id = liked_films.film_id " +
+                                        "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                                        "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM CAST(releaseDate AS date)) = ? " +
+                                        "GROUP BY f.id " +
+                                        "ORDER BY liked_films.likes desc " +
+                                        "LIMIT ?"),
+
     FIND_DIRECTOR_FILMS_QUERY("SELECT f.* FROM films_directors AS fd " +
             "LEFT JOIN films AS f ON fd.film_id = f.id " +
             "WHERE fd.director_id = ? "),
