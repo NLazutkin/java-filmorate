@@ -17,7 +17,6 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class FilmService {
         this.directorStorage = directorStorage;
     }
 
-    private FilmDto fillFilmData(Film film) {
+    protected FilmDto fillFilmData(Film film) {
         log.debug(String.format("Ищем жанры фильма %s", film.getName()));
         LinkedHashSet<Genre> genres = filmStorage.findGenresIds(film.getId()).stream()
                 .map(genreStorage::findGenre)
@@ -64,6 +63,7 @@ public class FilmService {
         log.debug(String.format("Фильм %s найден!", film.getName()));
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes, directors);
     }
+
 
     public FilmDto findFilm(Long filmId) {
         log.debug(String.format("Поиск фильма с ID %d", filmId));
@@ -207,19 +207,5 @@ public class FilmService {
                 .map(this::fillFilmData)
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .collect(Collectors.toList());
-    }
-
-    public Collection<FilmDto> getRecommendedFilms(Long userId) {
-        Collection<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId);
-
-        if (recommendedFilms.isEmpty()) {
-            log.debug("Для пользователя {} не найдено рекомендаций", userId);
-            return Collections.EMPTY_LIST;
-        } else {
-            log.debug("Для пользователя {} составлен список из {} фильмов(-a)", userId, recommendedFilms.size());
-            return recommendedFilms.stream()
-                    .map(this::fillFilmData)
-                    .collect(Collectors.toList());
-        }
     }
 }
