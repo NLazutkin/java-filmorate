@@ -43,7 +43,7 @@ public class FilmService {
         this.directorStorage = directorStorage;
     }
 
-    private FilmDto fillFilmData(Film film) {
+    protected FilmDto fillFilmData(Film film) {
         log.debug(String.format("Ищем жанры фильма %s", film.getName()));
         LinkedHashSet<Genre> genres = filmStorage.findGenresIds(film.getId()).stream()
                 .map(genreStorage::findGenre)
@@ -64,6 +64,7 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes, directors);
     }
 
+
     public FilmDto findFilm(Long filmId) {
         log.debug(String.format("Поиск фильма с ID %d", filmId));
 
@@ -76,6 +77,7 @@ public class FilmService {
                 .map(this::fillFilmData)
                 .collect(Collectors.toList());
     }
+
 
     public Collection<FilmDto> findPopular(Integer count) {
         if (count <= 0) {
@@ -243,3 +245,4 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 }
+

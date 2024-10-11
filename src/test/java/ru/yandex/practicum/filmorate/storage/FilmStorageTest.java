@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.ComponentScan;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -26,6 +27,7 @@ import java.util.LinkedHashSet;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmStorageTest {
     FilmDbStorage filmStorage;
+    UserDbStorage userStorage;
 
     @Test
     public void testFindFilmById() {
@@ -195,6 +197,59 @@ class FilmStorageTest {
     @Test
     public void testDeleteFilm() {
         assertThat(filmStorage.delete(4L)).isTrue();
+    }
+
+    @Test
+    public void testFindRecommendedFilm() {
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setEmail("user1@yandex.ru");
+        user1.setName("User1 Name");
+        user1.setLogin("User1Login");
+        user1.setBirthday(LocalDate.of(2000, 1, 1));
+        userStorage.create(user1);
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setEmail("user2@yandex.ru");
+        user2.setName("User2 Name");
+        user2.setLogin("User2Login");
+        user2.setBirthday(LocalDate.of(2000, 1, 1));
+        userStorage.create(user2);
+
+        Film newFilm = new Film();
+        newFilm.setId(5L);
+        newFilm.setName("Бойцовский клуб");
+        newFilm.setDescription("Сотрудник страховой компании страдает хронической бессонницей" +
+                " и отчаянно пытается вырваться из мучительно скучной жизни.");
+        newFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
+        newFilm.setDuration(120L);
+        newFilm.setMpa(new Mpa());
+        filmStorage.create(newFilm);
+
+        Film newFilm2 = new Film();
+        newFilm2.setId(6L);
+        newFilm2.setName("Большой куш");
+        newFilm2.setDescription("Фильм о группе криминальных отщепенцев, которые оказываются втянутыми в череду" +
+                " странных и зачастую уморительных событий.");
+        newFilm2.setReleaseDate(LocalDate.of(2000, 1, 1));
+        newFilm2.setDuration(120L);
+        newFilm2.setMpa(new Mpa());
+        filmStorage.create(newFilm2);
+
+        //user1 - 1 лайк
+        filmStorage.addLike(newFilm, user1);
+
+        //user2 - 2 лайка
+        filmStorage.addLike(newFilm, user2);
+        filmStorage.addLike(newFilm2, user2);
+
+        // recommendedFilms - 1 фильм
+        Collection<Film> recommendedFilms = filmStorage.getRecommendedFilms(user1.getId());
+        assertThat(recommendedFilms)
+                .hasSize(1)
+                .extracting(Film::getName)
+                .containsOnly("Большой куш");
     }
 
     @Test
