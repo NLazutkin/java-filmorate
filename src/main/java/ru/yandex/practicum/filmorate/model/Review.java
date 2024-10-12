@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
-import java.util.LinkedHashSet;
-
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = {"reviewId"})
@@ -22,7 +20,6 @@ public class Review {
     @NotNull(message = "Тип отзыва не должен быть пустым")
     Boolean isPositive;
     Integer useful = 0;
-    LinkedHashSet<Long> likes = new LinkedHashSet<>();
 
     public void increaseUseful() {
         this.useful++;
