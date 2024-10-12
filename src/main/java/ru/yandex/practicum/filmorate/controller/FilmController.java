@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +14,9 @@ import java.util.Collection;
 @RequestMapping("/films")
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class FilmController {
-    FilmService filmService;
-    String filmLikePath = "/{id}/like/{user-id}";
+    private final FilmService filmService;
+    private final String filmLikePath = "/{id}/like/{user-id}";
 
     @PutMapping(filmLikePath)
     public void addLike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {

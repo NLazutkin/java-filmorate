@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +16,10 @@ import java.util.Collection;
 @RequestMapping("/reviews")
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ReviewController {
-    ReviewService reviewService;
-    String reviewLikePath = "/{id}/like/{user-id}";
-    String reviewDislikePath = "/{id}/dislike/{user-id}";
+    private final ReviewService reviewService;
+    private final String reviewLikePath = "/{id}/like/{user-id}";
+    private final String reviewDislikePath = "/{id}/dislike/{user-id}";
 
     @PutMapping(reviewLikePath)
     public void addLike(@PathVariable("id") Long reviewId, @PathVariable("user-id") Long userId) {

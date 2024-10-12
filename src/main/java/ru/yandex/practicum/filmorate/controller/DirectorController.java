@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +16,9 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/directors")
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class DirectorController {
-    DirectorService directorService;
-    String directorPath = "/{id}";
+    private final DirectorService directorService;
+    private final String directorPath = "/{id}";
 
     @GetMapping(directorPath)
     public DirectorDto findDirector(@PathVariable("id") Long genreId) {
