@@ -29,8 +29,11 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<FilmDto> findPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
-        return filmService.findPopular(count);
+    public Collection<FilmDto> findPopular(
+            @RequestParam(name = "count", defaultValue = "10") Integer count,
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer year) {
+        return filmService.findPopular(count, genreId, year);
     }
 
     @GetMapping("/{id}")
@@ -63,6 +66,13 @@ public class FilmController {
     public Collection<FilmDto> findDirectorFilms(@PathVariable("directorId") Long directorId,
                                                  @RequestParam(name = "sortBy", defaultValue = "") String sortConditions) {
         return filmService.findDirectorFilms(directorId, sortConditions);
+    }
+
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilms(@RequestParam String query,
+                                           @RequestParam String by) {
+        log.debug("Запрос на поиск фильмов: query='{}', by='{}'", query, by);
+        return filmService.searchFilms(query, by);
     }
 
     @GetMapping("/common")
