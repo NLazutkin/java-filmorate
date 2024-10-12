@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -262,4 +263,39 @@ class FilmStorageTest {
                 .isInstanceOf(Collection.class);
     }
 
+    @Test
+    public void testFindPopularByYear() {
+        Integer count = 10;
+        Integer year = 2010;
+
+        assertThat(filmStorage.findPopularByYear(count, year)).isNotEmpty()
+                .hasSize(1)
+                .isInstanceOf(Collection.class)
+                .allMatch(film -> film.getReleaseDate().getYear() == 2010);
+    }
+
+    @Test
+    public void testFindPopularByGenre() {
+        Integer count = 10;
+        Long genreId = 1L;
+
+        assertThat(filmStorage.findPopularByGenre(count, genreId)).isNotEmpty()
+                .hasSize(2)
+                .isInstanceOf(Collection.class)
+                .allMatch(film -> film.getGenres().stream().allMatch(genre -> Objects.equals(genre.getId(), genreId)));
+    }
+
+    @Test
+    public void testFindPopularByGenreAndYear() {
+        Integer count = 10;
+        Long genreId = 3L;
+        Integer year = 2010;
+
+        assertThat(filmStorage.findPopularByGenreAndYear(count, genreId,year)).isNotEmpty()
+                .hasSize(1)
+                .isInstanceOf(Collection.class)
+                .allMatch(film -> film.getReleaseDate().getYear() == 2010)
+                .allMatch(film -> film.getGenres().stream()
+                        .allMatch(genre -> Objects.equals(genre.getId(), genreId)));
+    }
 }

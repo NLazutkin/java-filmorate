@@ -47,5 +47,11 @@ public interface FilmStorage {
 
     Collection<Film> findUserFilms(Long userId);
 
+    Collection<Film> findPopularByYear(Integer count, Integer year);
+
+    Collection<Film> findPopularByGenre(Integer count, Long genreId);
+
+    Collection<Film> findPopularByGenreAndYear(Integer count, Long genreId, Integer year);
+
     Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector);
 }

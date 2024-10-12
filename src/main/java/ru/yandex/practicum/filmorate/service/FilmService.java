@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
@@ -79,14 +80,34 @@ public class FilmService {
     }
 
 
-    public Collection<FilmDto> findPopular(Integer count) {
+    public Collection<FilmDto> findPopular(Integer count, Long genreId, Integer year) {
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
 
-        log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
+        Collection<Film> films = new ArrayList<>();
 
-        return filmStorage.findPopular(count).stream()
+        if (genreId != null && year != null) {
+            log.debug("Проверка на наличие жанра");
+            Genre genre = genreStorage.findGenre(genreId);
+
+            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков, жанру (%s) и %s году", count, genre.getName(), year));
+            films = filmStorage.findPopularByGenreAndYear(count, genreId, year);
+        } else if (genreId != null) {
+            log.debug("Проверка на наличие жанра");
+            Genre genre = genreStorage.findGenre(genreId);
+
+            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков и жанру (%s)", count, genre.getName()));
+            films = filmStorage.findPopularByGenre(count, genreId);
+        } else if (year != null) {
+            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков и %s году", count, year));
+            films = filmStorage.findPopularByYear(count, year);
+        } else {
+            log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
+            films = filmStorage.findPopular(count);
+        }
+
+        return films.stream()
                 .map(this::fillFilmData)
                 .collect(Collectors.toList());
     }
