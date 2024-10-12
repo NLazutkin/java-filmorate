@@ -43,6 +43,8 @@ public interface FilmStorage {
 
     LinkedHashSet<Long> getLikes(Long filmId);
 
+    Collection<Film> getRecommendedFilms(Long userId);
+
     Collection<Film> findUserFilms(Long userId);
 
     Collection<Film> findPopularByYear(Integer count, Integer year);
@@ -50,4 +52,6 @@ public interface FilmStorage {
     Collection<Film> findPopularByGenre(Integer count, Long genreId);
 
     Collection<Film> findPopularByGenreAndYear(Integer count, Long genreId, Integer year);
+
+    Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector);
 }
