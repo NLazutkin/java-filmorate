@@ -4,16 +4,14 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component("InMemoryFilmStorage")
+@Component("InMemoryReviewStorage")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryReviewStorage implements ReviewStorage {
     Map<Long, Review> reviews = new HashMap<>();
@@ -29,69 +27,53 @@ public class InMemoryReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public Collection<Review> findAll() {
-        return reviews.values();
-    }
-
-    @Override
     public Review findReview(Long reviewId) {
         return Optional.ofNullable(reviews.get(reviewId))
                 .orElseThrow(() -> new NotFoundException(String.format("Отзыв №%d не найден", reviewId)));
     }
 
     @Override
-    public Collection<Review> reviewsByFilmId(Long film_id, Integer count) {
-        return findAll()
+    public Collection<Review> reviewsByFilmId(Long filmId, Integer count) {
+        log.debug("Получаем список из {} отзывов фильма с ID {}", count, filmId);
+
+        if (filmId == 0L) {
+            return reviews.values()
+                    .stream()
+                    .limit(count)
+                    .collect(Collectors.toList());
+        }
+
+        return reviews.values()
                 .stream()
-                .sorted(Comparator.comparing((Review review) -> review.getLikes().size(), Comparator.reverseOrder()))
+                .filter(review -> Objects.equals(review.getFilmId(), filmId))
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void addLike(Review review, User user, boolean isPositive) {
-        if (review.getLikes().contains(user.getId())) {
-            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму №%d",
-                    user.getName(), review.getId()));
-        }
-
-        review.getLikes().add(user.getId());
-    }
-
-    public LinkedHashSet<Long> getLikes(Long reviewId) {
-        Review review = reviews.get(reviewId);
-        LinkedHashSet<Long> likes = review.getLikes();
-
-        if (likes == null || likes.isEmpty()) {
-            log.trace(String.format("У отзыва %d нет лайков", review.getId()));
-            return new LinkedHashSet<>();
-        }
-
-        return likes;
+    public void increaseUseful(Long reviewId) {
+        findReview(reviewId).increaseUseful();
+        log.trace("Рейтинг полезности отзыва увеличен на 1");
     }
 
     @Override
-    public void deleteLike(Review review, User user, boolean isPositive) {
-        if (!review.getLikes().contains(user.getId())) {
-            throw new NotFoundException(String.format("Пользователь %s не ставил лайк отзыву №%d. Удалить лайк невозможно",
-                    user.getName(), review.getId()));
-        }
-
-        review.getLikes().remove(user.getId());
+    public void decreaseUseful(Long reviewId) {
+        findReview(reviewId).decreaseUseful();
+        log.trace("Рейтинг полезности отзыва уменьшен на 1");
     }
 
     @Override
     public Review create(Review review) {
-        review.setId(getNextId());
-        reviews.put(review.getId(), review);
+        review.setReviewId(getNextId());
+        reviews.put(review.getReviewId(), review);
 
         return review;
     }
 
     @Override
     public Review update(Review newReview) {
-        reviews.put(newReview.getId(), newReview);
-        log.trace(String.format("Данные об отзыве %d обновлены!",  newReview.getId()));
+        reviews.put(newReview.getReviewId(), newReview);
+        log.trace("Данные об отзыве {} обновлены!", newReview.getReviewId());
 
         return newReview;
     }

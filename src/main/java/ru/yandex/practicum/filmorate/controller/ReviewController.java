@@ -22,40 +22,34 @@ public class ReviewController {
     private final String reviewDislikePath = "/{id}/dislike/{user-id}";
 
     @PutMapping(reviewLikePath)
-    public void addLike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
-        reviewService.addLike(filmId, userId);
+    public void addLike(@PathVariable("id") Long reviewId, @PathVariable("user-id") Long userId) {
+        reviewService.addLike(reviewId, userId);
     }
 
     @DeleteMapping(reviewLikePath)
-    public void deleteLike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
-        reviewService.deleteLike(filmId, userId);
+    public boolean deleteLike(@PathVariable("id") Long reviewId, @PathVariable("user-id") Long userId) {
+        return reviewService.deleteLike(reviewId, userId);
     }
 
     @PutMapping(reviewDislikePath)
-    public void addDislike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
-        reviewService.addDislike(filmId, userId);
+    public void addDislike(@PathVariable("id") Long reviewId, @PathVariable("user-id") Long userId) {
+        reviewService.addDislike(reviewId, userId);
     }
 
     @DeleteMapping(reviewDislikePath)
-    public void deleteDislike(@PathVariable("id") Long filmId, @PathVariable("user-id") Long userId) {
-        reviewService.deleteDislike(filmId, userId);
+    public boolean deleteDislike(@PathVariable("id") Long reviewId, @PathVariable("user-id") Long userId) {
+        return reviewService.deleteDislike(reviewId, userId);
     }
 
-    GET /reviews?filmId={filmId}&count={count}
     @GetMapping
-    public Collection<ReviewDto> reviewsByFilmId(@RequestParam(name = "filmId", defaultValue = "0") Long film_id,
+    public Collection<ReviewDto> reviewsByFilmId(@RequestParam(name = "filmId", defaultValue = "0") Long filmId,
                                                  @RequestParam(name = "count", defaultValue = "10") Integer count) {
-        return reviewService.reviewsByFilmId(film_id, count);
+        return reviewService.reviewsByFilmId(filmId, count);
     }
 
     @GetMapping("/{id}")
     public ReviewDto findReview(@PathVariable("id") Long reviewId) {
         return reviewService.findReview(reviewId);
-    }
-
-    @GetMapping
-    public Collection<ReviewDto> findAll() {
-        return reviewService.findAll();
     }
 
     @PostMapping

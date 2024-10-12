@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,17 +10,25 @@ import java.util.LinkedHashSet;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"reviewId"})
 public class Review {
-    Long id;
+    Long reviewId;
     @NotNull(message = "У отзыва должен быть автор. Укажите пользователя")
-    Long user_id;
+    Long userId;
     @NotNull(message = "Отзыв должен быть написан для фильма. Укажите фильм")
-    Long film_id;
+    Long filmId;
+    @NotNull(message = "Отзыв должен содержать текст. Напишите отзыв!")
     String content;
-    @NotNull
-    @Pattern(regexp = "^true$|^false$", message = "Может быть только true или false")
-    boolean isPositive;
+    @NotNull(message = "Тип отзыва не должен быть пустым")
+    Boolean isPositive;
     Integer useful = 0;
     LinkedHashSet<Long> likes = new LinkedHashSet<>();
+
+    public void increaseUseful() {
+        this.useful++;
+    }
+
+    public void decreaseUseful() {
+        this.useful--;
+    }
 }

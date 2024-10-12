@@ -9,13 +9,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReviewDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Long id;
+    Long reviewId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Long user_id;
+    Long userId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Long film_id;
+    Long filmId;
     String content;
-    boolean isPositive;
+    Boolean isPositive;
     Integer useful = 0;
 }
 

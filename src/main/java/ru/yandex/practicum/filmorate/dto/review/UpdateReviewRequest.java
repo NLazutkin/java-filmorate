@@ -9,15 +9,15 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateReviewRequest {
-    Long id;
+    Long reviewId;
     @NotNull(message = "У отзыва должен быть автор. Укажите пользователя")
-    Long user_id;
+    Long userId;
     @NotNull(message = "Отзыв должен быть написан для фильма. Укажите фильм")
-    Long film_id;
+    Long filmId;
+    @NotNull(message = "Отзыв должен содержать текст. Напишите отзыв!")
     String content;
-    @NotNull
-    @Pattern(regexp = "^true$|^false$", message = "Может быть только true или false")
-    boolean isPositive;
+    @NotNull(message = "Тип отзыва не должен быть пустым")
+    Boolean isPositive;
     Integer useful = 0;
 
     public boolean hasContent() {

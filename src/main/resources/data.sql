@@ -4,6 +4,8 @@ TRUNCATE TABLE FILMS_GENRES;
 
 TRUNCATE TABLE FILMS_DIRECTORS;
 
+TRUNCATE TABLE REVIEWS_LIKES;
+
 TRUNCATE TABLE FRIENDS;
 
 TRUNCATE TABLE LIKES;
@@ -19,6 +21,8 @@ TRUNCATE TABLE DIRECTORS RESTART IDENTITY;
 TRUNCATE TABLE RATINGS RESTART IDENTITY;
 
 TRUNCATE TABLE STATUSES RESTART IDENTITY;
+
+TRUNCATE TABLE REVIEWS RESTART IDENTITY;
 
 SET REFERENTIAL_INTEGRITY TRUE;
 
@@ -59,6 +63,13 @@ VALUES ('Джордж Лукас'), 	-- 1
 		('Пьер Коффан'),	-- 4
 		('Крис Рено');		-- 5
 
+INSERT INTO REVIEWS (USER_ID , FILM_ID , CONTENT , ISPOSITIVE , USEFUL)
+VALUES (1, 4, 'Хороший отзыв', TRUE, 2),        -- 1
+		(2, 3, 'Очень хороший отзыв', TRUE, 0), -- 2
+		(3, 2, 'Отзыв', FALSE, 1),              -- 3
+		(3, 1, 'Плохой отзыв', FALSE, -2),      -- 4
+        (2, 4, 'Очень плохой отзыв', FALSE, 2);  -- 5
+
 INSERT INTO LIKES (FILM_ID, USER_ID)
 VALUES (1, 1), (1, 3),
 		(2, 1), (2, 2), (2, 3),
@@ -81,3 +92,9 @@ VALUES (1, 1), (1, 3),
         (2, 1),
         (3, 2),
         (4, 4), (4, 5);
+
+INSERT INTO REVIEWS_LIKES (REVIEW_ID, USER_ID, ISLIKE)
+VALUES (1, 2, TRUE), (1, 3, TRUE),
+		(2, 1, TRUE), (2, 3, FALSE),
+		(3, 1, TRUE),
+		(4, 1, FALSE), (4, 2, FALSE);

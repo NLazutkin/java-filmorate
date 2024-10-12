@@ -1,27 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 public interface ReviewStorage {
+    Review create(Review review);
+
     Review findReview(Long reviewId);
 
-    Review create(Review review);
+    Collection<Review> reviewsByFilmId(Long filmId, Integer count);
 
     Review update(Review newReview);
 
     boolean delete(Long reviewId);
 
-    Collection<Review> findAll();
+    void increaseUseful(Long reviewId);
 
-    Collection<Review> reviewsByFilmId(Long film_id, Integer count);
-
-    void addLike(Review review, User user, boolean isPositive);
-
-    void deleteLike(Review review, User user, boolean isPositive);
-
-    LinkedHashSet<Long> getLikes(Long reviewId);
+    void decreaseUseful(Long reviewId);
 }

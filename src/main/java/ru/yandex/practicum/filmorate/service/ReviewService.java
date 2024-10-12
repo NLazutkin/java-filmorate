@@ -12,11 +12,13 @@ import ru.yandex.practicum.filmorate.dto.review.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.estimation.EstimationStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,81 +28,129 @@ public class ReviewService {
     ReviewStorage reviewStorage;
     FilmStorage filmStorage;
     UserStorage userStorage;
+    EstimationStorage estimationStorage;
 
     @Autowired
     public ReviewService(@Qualifier("ReviewDbStorage"/*"InMemoryReviewStorage"*/) ReviewStorage reviewStorage,
                          @Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
-                         @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage) {
+                         @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
+                         @Qualifier("EstimationDbStorage"/*"InMemoryEstimationStorage"*/) EstimationStorage estimationStorage) {
         this.reviewStorage = reviewStorage;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.estimationStorage = estimationStorage;
     }
 
     public ReviewDto findReview(Long reviewId) {
-        log.debug(String.format("Поиск отзыва с ID %d", reviewId));
+        log.debug("Поиск отзыва с ID {}", reviewId);
 
         return ReviewMapper.mapToReviewDto(reviewStorage.findReview(reviewId));
     }
 
-    public Collection<ReviewDto> findAll() {
-        log.debug("Получаем список всех отзывов");
-        return reviewStorage.findAll().stream()
+    public Collection<ReviewDto> reviewsByFilmId(Long filmId, Integer count) {
+        log.debug("Получаем список отзывов");
+
+        return reviewStorage.reviewsByFilmId(filmId, count).stream()
                 .map(ReviewMapper::mapToReviewDto)
                 .collect(Collectors.toList());
     }
 
-    public Collection<ReviewDto> reviewsByFilmId(Long film_id, Integer count) {
-        log.debug(String.format("Получаем список из %d отзывов", count));
-
-        return reviewStorage.reviewsByFilmId(film_id, count).stream()
-                .map(ReviewMapper::mapToReviewDto)
-                .collect(Collectors.toList());
-    }
-
-    public void addLike(Long reviewId, Long userId, boolean isPositive) {
+    public void addLike(Long reviewId, Long userId) {
         log.trace("Попытка пользователя поставить лайк отзыву...");
 
         Review review = reviewStorage.findReview(reviewId);
         User user = userStorage.findUser(userId);
 
-        reviewStorage.addLike(review, user, isPositive);
+        Optional<Estimation> estimation = estimationStorage.findEstimation(reviewId, userId);
+        if (estimation.isPresent()) {
+            if (estimation.get().getIsLike().equals(Boolean.TRUE)) {
+                log.trace("Лайк отзыву c №{} уже существует", reviewId);
+                return;
+            } else {
+                log.trace("На отзыве c №{} уже существует дизлайк. Удаляем дизлайк и ставил лайк", reviewId);
+                estimationStorage.deleteEstimation(reviewId, userId, Boolean.FALSE);
+                reviewStorage.increaseUseful(review.getReviewId());
+            }
+        }
 
-        log.debug(String.format("Пользователь %s ставит лайк фильму %d", user.getName(), review.getId()));
+        estimationStorage.addEstimation(review, user, Boolean.TRUE);
+
+        log.trace("Пользователь {} ставит лайк отзыву №{}", user.getName(), review.getReviewId());
+        reviewStorage.increaseUseful(review.getReviewId());
     }
 
-    public void deleteLike(Long reviewId, Long userId, boolean isPositive) {
-        log.trace("Попытка удалить лайк с отзыва...");
+    public void addDislike(Long reviewId, Long userId) {
+        log.trace("Попытка пользователя поставить дизлайк отзыву...");
 
         Review review = reviewStorage.findReview(reviewId);
         User user = userStorage.findUser(userId);
 
-        reviewStorage.deleteLike(review, user, isPositive);
+        Optional<Estimation> estimation = estimationStorage.findEstimation(reviewId, userId);
+        if (estimation.isPresent()) {
+            if (estimation.get().getIsLike().equals(Boolean.FALSE)) {
+                log.trace("Дизлайк отзыву c №{} уже существует", reviewId);
+                return;
+            } else {
+                log.trace("На отзыве c №{} уже существует лайк. Удаляем лайк и ставим дизлайк", reviewId);
+                estimationStorage.deleteEstimation(reviewId, userId, Boolean.TRUE);
+                reviewStorage.decreaseUseful(review.getReviewId());
+            }
+        }
 
-        log.debug(String.format("Пользователь %s убирает лайк с отзыва %d", user.getName(), review.getId()));
+        estimationStorage.addEstimation(review, user, Boolean.FALSE);
+
+        log.trace("Пользователь {} ставит дизлайк отзыву №{}", user.getName(), review.getReviewId());
+        reviewStorage.decreaseUseful(review.getReviewId());
+    }
+
+    public boolean deleteLike(Long reviewId, Long userId) {
+        log.trace("Попытка удалить лайк с отзыва...");
+
+        boolean result = estimationStorage.deleteEstimation(reviewId, userId, Boolean.TRUE);
+
+        if (result) {
+            log.trace("Пользователь удаляет лайк отзыву");
+            reviewStorage.decreaseUseful(reviewId);
+        }
+
+        return result;
+    }
+
+    public boolean deleteDislike(Long reviewId, Long userId) {
+        log.trace("Попытка удалить дизлайк с отзыва...");
+
+        boolean result = estimationStorage.deleteEstimation(reviewId, userId, Boolean.FALSE);
+
+        if (result) {
+            log.trace("Пользователь удаляет дизлайк отзыву");
+            reviewStorage.decreaseUseful(reviewId);
+        }
+
+        return result;
     }
 
     public ReviewDto create(NewReviewRequest request) {
-        log.debug(String.format("Создаем отзыв пользователя в id %d, для фильма c id %d", request.getUser_id(), request.getFilm_id()));
+        log.debug("Создаем отзыв пользователя под номером {}, для фильма c id {}", request.getUserId(), request.getFilmId());
         Review review = ReviewMapper.mapToReview(request);
 
-        Film film = filmStorage.findFilm(review.getFilm_id());
-        User user = userStorage.findUser(review.getUser_id());
+        Film film = filmStorage.findFilm(review.getFilmId());
+        User user = userStorage.findUser(review.getUserId());
 
         Review createdReview = reviewStorage.create(review);
 
-        log.trace(String.format("Отзыв пользователя %s о фильме %S сохранен под номером %d!",
-                user.getName(), film.getName(), createdReview.getId()));
+        log.trace("Отзыв пользователя {} о фильме {} сохранен под номером {}",
+                user.getName(), film.getName(), createdReview.getReviewId());
         return ReviewMapper.mapToReviewDto(createdReview);
     }
 
     public ReviewDto update(UpdateReviewRequest request) {
         log.debug("Обновляем данные отзыва");
 
-        if (request.getId() == null) {
-            throw new ValidationException("Не указан Id отзыва!");
+        if (request.getReviewId() == null) {
+            throw new ValidationException("Не указан № отзыва!");
         }
 
-        Review updatedReview = ReviewMapper.updateReviewFields(reviewStorage.findReview(request.getId()), request);
+        Review updatedReview = ReviewMapper.updateReviewFields(reviewStorage.findReview(request.getReviewId()), request);
         updatedReview = reviewStorage.update(updatedReview);
 
         return ReviewMapper.mapToReviewDto(updatedReview);
@@ -108,7 +158,7 @@ public class ReviewService {
 
     public boolean delete(Long reviewId) {
         Review review = reviewStorage.findReview(reviewId);
-        log.debug("Удаляем данные отзыва №" + review.getId());
-        return filmStorage.delete(reviewId);
+        log.debug("Удаляем данные отзыва №{}", review.getReviewId());
+        return reviewStorage.delete(reviewId);
     }
 }

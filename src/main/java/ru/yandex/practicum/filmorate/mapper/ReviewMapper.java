@@ -12,11 +12,11 @@ public final class ReviewMapper {
 
     public static ReviewDto mapToReviewDto(Review review) {
         ReviewDto dto = new ReviewDto();
-        dto.setId(review.getId());
-        dto.setUser_id(review.getUser_id());
-        dto.setFilm_id(review.getFilm_id());
+        dto.setReviewId(review.getReviewId());
+        dto.setUserId(review.getUserId());
+        dto.setFilmId(review.getFilmId());
         dto.setContent(review.getContent());
-        dto.setPositive(review.isPositive());
+        dto.setIsPositive(review.getIsPositive());
         dto.setUseful(review.getUseful());
 
         return dto;
@@ -24,10 +24,10 @@ public final class ReviewMapper {
 
     public static Review mapToReview(NewReviewRequest request) {
         Review film = new Review();
-        film.setUser_id(request.getUser_id());
-        film.setFilm_id(request.getFilm_id());
+        film.setUserId(request.getUserId());
+        film.setFilmId(request.getFilmId());
         film.setContent(request.getContent());
-        film.setPositive(request.isPositive());
+        film.setIsPositive(request.getIsPositive());
         film.setUseful(request.getUseful());
 
         return film;
@@ -38,7 +38,7 @@ public final class ReviewMapper {
             review.setContent(request.getContent());
         }
 
-        review.setPositive(request.isPositive());
+        review.setIsPositive(request.getIsPositive());
 
         if (request.hasUseful()) {
             review.setUseful(request.getUseful());
