@@ -45,28 +45,28 @@ public class FilmService {
     }
 
     protected FilmDto fillFilmData(Film film) {
-        log.debug(String.format("Ищем жанры фильма %s", film.getName()));
+        log.debug("Ищем жанры фильма {}", film.getName());
         LinkedHashSet<Genre> genres = filmStorage.findGenresIds(film.getId()).stream()
                 .map(genreStorage::findGenre)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        log.debug(String.format("Ищем режиссеров фильма %s", film.getName()));
+        log.debug("Ищем режиссеров фильма {}", film.getName());
         LinkedHashSet<Director> directors = filmStorage.findDirectorsIds(film.getId()).stream()
                 .map(directorStorage::findDirector)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        log.debug(String.format("Ищем лайки фильма %s", film.getName()));
+        log.debug("Ищем лайки фильма {}", film.getName());
         LinkedHashSet<Long> likes = filmStorage.getLikes(film.getId());
 
-        log.debug(String.format("Ищем рейтинг фильма %s", film.getName()));
+        log.debug("Ищем рейтинг фильма {}", film.getName());
         Mpa mpa = mpaStorage.findMpa(filmStorage.findRatingId(film.getId()));
 
-        log.debug(String.format("Фильм %s найден!", film.getName()));
+        log.debug("Фильм {} найден!", film.getName());
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes, directors);
     }
 
     public FilmDto findFilm(Long filmId) {
-        log.debug(String.format("Поиск фильма с ID %d", filmId));
+        log.debug("Поиск фильма с ID {}", filmId);
 
         return fillFilmData(filmStorage.findFilm(filmId));
     }
@@ -90,19 +90,19 @@ public class FilmService {
             log.debug("Проверка на наличие жанра");
             Genre genre = genreStorage.findGenre(genreId);
 
-            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков, жанру (%s) и %s году", count, genre.getName(), year));
+            log.debug("Получаем список из первых {} фильмов по количеству лайков, жанру ({}) и {} году", count, genre.getName(), year);
             films = filmStorage.findPopularByGenreAndYear(count, genreId, year);
         } else if (genreId != null) {
             log.debug("Проверка на наличие жанра");
             Genre genre = genreStorage.findGenre(genreId);
 
-            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков и жанру (%s)", count, genre.getName()));
+            log.debug("Получаем список из первых {} фильмов по количеству лайков и жанру ({})", count, genre.getName());
             films = filmStorage.findPopularByGenre(count, genreId);
         } else if (year != null) {
-            log.debug(String.format("Получаем список из первых %s фильмов по количеству лайков и %s году", count, year));
+            log.debug("Получаем список из первых {} фильмов по количеству лайков и {} году", count, year);
             films = filmStorage.findPopularByYear(count, year);
         } else {
-            log.debug(String.format("Получаем список из первых %d фильмов по количеству лайков", count));
+            log.debug("Получаем список из первых {} фильмов по количеству лайков", count);
             films = filmStorage.findPopular(count);
         }
 
@@ -119,7 +119,7 @@ public class FilmService {
 
         filmStorage.addLike(film, user);
 
-        log.debug(String.format("Пользователь %s ставит лайк фильму %s", user.getName(), film.getName()));
+        log.debug("Пользователь {} ставит лайк фильму {}", user.getName(), film.getName());
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -130,7 +130,7 @@ public class FilmService {
 
         filmStorage.deleteLike(film, user);
 
-        log.debug(String.format("Пользователь %s убирает лайк с фильма %s", user.getName(), film.getName()));
+        log.debug("Пользователь {} убирает лайк с фильма {}", user.getName(), film.getName());
     }
 
     public Collection<FilmDto> findDirectorFilms(Long directorId, String sortConditions) {
@@ -139,13 +139,13 @@ public class FilmService {
 
         Collection<Film> films;
         if (sortConditions.equals("year")) {
-            log.debug(message + " по году выпуска");
+            log.debug("{} по году выпуска", message);
             films = filmStorage.findDirectorFilmsOrderYear(directorId);
         } else if (sortConditions.equals("likes")) {
-            log.debug(message + " по количеству лайков");
+            log.debug("{} по количеству лайков", message);
             films = filmStorage.findDirectorFilmsOrderLikes(directorId);
         } else {
-            log.debug("Условия сортировки не заданы. " + message);
+            log.debug("Условия сортировки не заданы. {}", message);
             films = filmStorage.findDirectorFilms(directorId);
         }
 
@@ -155,7 +155,7 @@ public class FilmService {
     }
 
     public FilmDto create(NewFilmRequest request) {
-        log.debug(String.format("Создаем запись о фильме %s", request.getName()));
+        log.debug("Создаем запись о фильме {}", request.getName());
         Film film = FilmMapper.mapToFilm(request);
 
         if (film.getMpa().getId() != null) {
@@ -174,7 +174,7 @@ public class FilmService {
                 .peek(director -> filmStorage.addDirectorId(director, createdfilm))
                 .toList();
 
-        log.trace(String.format("Фильм %s сохранен!", createdfilm.getName()));
+        log.trace("Фильм {} сохранен!", createdfilm.getName());
         return FilmMapper.mapToFilmDto(createdfilm);
     }
 
@@ -208,7 +208,7 @@ public class FilmService {
 
     public boolean delete(Long filmId) {
         Film film = filmStorage.findFilm(filmId);
-        log.debug("Удаляем данные фильма " + film.getName());
+        log.debug("Удаляем данные фильма {}", film.getName());
         return filmStorage.delete(filmId);
     }
 

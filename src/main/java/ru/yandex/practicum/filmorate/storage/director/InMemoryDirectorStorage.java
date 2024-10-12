@@ -69,7 +69,7 @@ public class InMemoryDirectorStorage implements DirectorStorage {
     @Override
     public Director update(Director newDirector) {
         directors.put(newDirector.getId(), newDirector);
-        log.trace(String.format("Данные о режиссере %s обновлены!", newDirector.getName()));
+        log.trace("Данные о режиссере {} обновлены!", newDirector.getName());
         return newDirector;
     }
 

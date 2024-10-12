@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum UserQueries {
     FIND_ALL_QUERY("SELECT u.id, u.email, u.login, u.name, u.birthday, GROUP_CONCAT(f.friend_id) AS friends " +
             "FROM users u " +
@@ -39,7 +43,7 @@ public enum UserQueries {
 
     DELETE_FRIEND_QUERY("DELETE FROM friends WHERE user_id = ? AND friend_id = ?");
 
-    private final String query;
+    String query;
 
     UserQueries(String query) {
         this.query = query;

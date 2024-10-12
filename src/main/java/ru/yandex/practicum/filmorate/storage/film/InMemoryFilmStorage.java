@@ -132,7 +132,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         LinkedHashSet<Long> likes = film.getLikes();
 
         if (likes == null || likes.isEmpty()) {
-            log.trace(String.format("У фильма %s нет лайков", film.getName()));
+            log.trace("У фильма {} нет лайков", film.getName());
             return new LinkedHashSet<>();
         }
 
@@ -215,7 +215,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film update(Film newFilm) {
         films.put(newFilm.getId(), newFilm);
         filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
-        log.trace(String.format("Данные о фильме %s обновлены!", newFilm.getName()));
+        log.trace("Данные о фильме {} обновлены!", newFilm.getName());
         return newFilm;
     }
 

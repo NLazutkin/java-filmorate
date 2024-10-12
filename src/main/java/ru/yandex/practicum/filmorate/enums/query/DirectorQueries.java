@@ -1,6 +1,10 @@
 
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum DirectorQueries {
     FIND_ALL_QUERY("SELECT * FROM directors"),
 
@@ -14,7 +18,7 @@ public enum DirectorQueries {
 
     DELETE_QUERY("DELETE FROM directors WHERE id = ?");
 
-    private final String query;
+    String query;
 
     DirectorQueries(String query) {
         this.query = query;

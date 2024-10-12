@@ -45,13 +45,13 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.addFriend(userId, friendId);
 
-        log.debug(String.format("Добавляем %s в список друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Добавляем {} в список друзей {}", names.getSecond(), names.getFirst());
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.deleteFriend(userId, friendId);
 
-        log.debug(String.format("Удаляем %s из списка друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Удаляем {} из списка друзей {}", names.getSecond(), names.getFirst());
     }
 
     public Collection<UserDto> findFriends(Long userId) {
@@ -112,7 +112,7 @@ public class UserService {
 
     public boolean delete(Long filmId) {
         User user = userStorage.findUser(filmId);
-        log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
+        log.debug("Удаляем данные пользователя {}", user.getName());
         return userStorage.delete(filmId);
     }
 

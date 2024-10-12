@@ -68,7 +68,7 @@ public class MpaService {
 
     public boolean delete(Long mpaId) {
         Mpa mpa = mpaStorage.findMpa(mpaId);
-        log.debug(String.format("Удаляем данные рейтинга %s", mpa.getName()));
+        log.debug("Удаляем данные рейтинга {}", mpa.getName());
         return mpaStorage.delete(mpaId);
     }
 }

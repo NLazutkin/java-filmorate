@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum FilmQueries {
     FIND_ALL_QUERY("SELECT * FROM films"),
 
@@ -105,7 +109,7 @@ public enum FilmQueries {
             "ORDER BY common_likes DESC " +
             "LIMIT 1");
 
-    private final String query;
+    String query;
 
     FilmQueries(String query) {
         this.query = query;

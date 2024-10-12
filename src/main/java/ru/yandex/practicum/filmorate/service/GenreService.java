@@ -66,7 +66,7 @@ public class GenreService {
 
     public boolean delete(Long genreId) {
         Genre genre = genreStorage.findGenre(genreId);
-        log.debug(String.format("Удаляем данные жанра %s", genre.getName()));
+        log.debug("Удаляем данные жанра {}", genre.getName());
         return genreStorage.delete(genreId);
     }
 }
