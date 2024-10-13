@@ -1,198 +1,178 @@
-# java-filmorate
-Template repository for Filmorate project.
+ # Filmorate
 
-## РЎС…РµРјР° Р±Р°Р·С‹ РґР°РЅРЅС‹С… 
+<u>**Filmorate** — это учебный проект, представляющий собой бэкенд-сервис для поиска и оценки фильмов.</u>
 
-![РЎС…РµРјР° Р±Р°Р·С‹ РґР°РЅРЅС‹С… РїСЂРѕРµРєС‚Р° Filmorate](/assets/images/Filmorate.png)
+### Стек технологий и опыт разработки
 
+В процессе разработки использовались следующие технологии:
+
+- **Java 11**
+- **Spring Boot**
+- **Spring Data JPA**
+-  **H2 Database**
+- **Lombok**
+- **REST API** 
+- **JUnit 5** 
+- **Maven**
+- **Postman**
+- **GitHub**
+
+## Функционал
+### Фильмы:
+- Добавить фильм.
+- Обновить фильм.
+- Найти фильм по id.
+- Получить список всех фильмов.
+- Удалить фильм.
+- Поставить лайк.
+- Удалить лайк.
+- Отобразить популярные фильмы.
+- Поиск фильмов по названию и/или режиссёру.
+
+### Пользователи:
+- Добавить пользователя.
+- Обновить пользователя.
+- Найти пользователя по id.
+- Получить список пользователей.
+- Удалить пользователя.
+- Добавить пользователя в друзья.
+- Удалить пользователя из друзей.
+- Найти общих друзей с другим пользователем.
+- Получить список рекомендаций по фильмам.
+
+### Жанры:
+- Добавить жанр.
+- Обновить жанр.
+- Найти жанр по id.
+- Получить список всех жанров.
+- Удалить жанр.
+
+### Рейтинг (MPA):
+- Добавить рейтинг.
+- Обновить рейтинг.
+- Найти рейтинг по id.
+- Получить список всех рейтингов.
+- Удалить рейтинг.
+
+### Отзывы на фильм:
+- Добавить отзыв.
+- Обновить отзыв.
+- Получить список отзывов о фильме.
+- Найти отзыв по id.
+- Поставить лайк отзыву.
+- Поставить дизлайк отзыву.
+- Удалить лайк.
+- Удалить дизлайк.
+- Удалить отзыв.
+
+### Режиссёры:
+- Добавить режиссёра.
+- Обновить данные режиссёра.
+- Получить список режиссёров.
+- Найти режиссёра по id.
+- Удалить режиссёра.
+
+### Новостная лента:
+- Добавить событие.
+- Получить историю событий пользователя по id.
+
+## Этапы разработки
+
+### Разработка приложения велась в 4 этапа.
+
+**1 этап (Индивидуальный)**: 
+   - Реализована базовая архитектура приложения.
+   - Созданы модели данных `User` и `Film`.
+   - Организована логика хранения данных в памяти приложения.
+   - Настроена валидация пользовательских данных.
+   - Включено логирование операций.
+   - Написаны юнит-тесты для проверки работы с данными в памяти.
+
+**2 этап (Индивидуальный)**:
+   - Оптимизирована архитектура приложения.
+   - Логика разделена на слои бизнес-логики и системы хранения данных.
+   - Внедрены зависимости с помощью Spring Framework.
+   - Реализованы контроллеры для обработки HTTP-запросов (эндпоинтов).
+   - Добавлено расширенное логирование для отслеживания операций.
+
+**3 этап (Индивидуальный)**:
+   - Проведена интеграция с базой данных.
+   - Разработаны DAO-классы для взаимодействия с сущностями `User`, `Film`, `Genre`, `MPA`.
+   - Написаны SQL-запросы для работы с базой данных.
+   - Обновлены тесты для проверки работы с данными из БД.
+
+**4 этап (Групповой)**:
+   - Проведено первоначальное планирование, проектирование, разработка, ревью, тестирование, презентация заказчику.
+   - Добавлены ключевые функции, такие как: система отзывов, поиск, общие фильмы, рекомендации, лента событий, популярные фильмы, фильмы по режиссерам, удаление пользователей и фильмов.
+   - Разработаны DAO-классы для работы с сущностями `Director`, `Review`, `Feed`.
+   - Созданы основные таблицы (`directors`, `reviews`, `feeds`) и соединительные таблицы (`films_directors`, `reviews_like`).
+   - Написаны дополнительные SQL-запросы для обеспечения работы с новыми сущностями.
+   - Обновлены тесты для проверки новых функций и работы с данными из БД.
+
+## ER-диаграмма
+
+![Схема базы данных проекта Filmorate](/assets/images/Filmorate.png)
+
+<details><summary><strong><span style="font-size: 20px;">Пояснения к таблицам БД</span></strong></summary>
+   
 ### Film
-- РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„РёР»СЊРјР°С…
+- Информация о фильмах
 
 ### Rating
-- РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЂРµР№С‚РёРЅРіР°С… С„РёР»СЊРјРѕРІ
+- Информация о рейтингах фильмов
 
 ### Film_Genre
-- РЎРѕРµРґРёРЅРёС‚РµР»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° РґР»СЏ С„РёР»СЊРјРѕРІ Рё РёС… Р¶Р°РЅСЂРѕРІ
+- Соединительная таблица для фильмов и их жанров
 
 ### Genre
-- РРЅС„РѕСЂРјР°С†РёСЏ Рѕ Р¶Р°РЅСЂР°С… С„РёР»СЊРјРѕРІ
+- Информация о жанрах фильмов
 
 ### User
-- РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏС… РїСЂРёР»РѕР¶РµРЅРёСЏ
+- Информация о пользователях приложения
 
 ### Film_User
-- РЎРѕРµРґРёРЅРёС‚РµР»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° РґР»СЏ С„РёР»СЊРјРѕРІ Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏС… РѕС†РµРЅРёРІС€РёС… С„РёР»СЊРј
+- Соединительная таблица для фильмов и пользователях, оценивших фильм
 
 ### Friends
-- РЎРѕРµРґРёРЅРёС‚РµР»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ Рё РёС… РґСЂСѓР·РµР№ (РґСЂСѓРіРёС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№)
+- Соединительная таблица для пользователей и их друзей (других пользователей)
 
-### Status
-- РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃС‚Р°С‚СѓСЃРµ Р·Р°РїСЂРѕСЃР° "РґСЂСѓР¶Р±С‹" РјРµР¶РґСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё
+### Statuses
+- Информация о статусе запроса "дружбы" между пользователями
 
-***
+### Directors
+- Информация о режиссёрах
 
-## РџСЂРёРјРµСЂС‹ Р·Р°РїСЂРѕСЃРѕРІ РЅР° СЏР·С‹РєРµ SQL РґР»СЏ РјРѕРґРµР»Рё User
+### Film_Directors
+- Соединительная таблица для фильма и его режиссёра
 
-### 1. РќР°Р№С‚Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+### Feeds
+- Информация о последних событиях на платформе
 
-#### findUser(Long userId)
-```sql
-SELECT u.*
-FROM User AS u
-WHERE u.id = {userId};
-```
+### Reviews
+- Информация об отзыве к фильму
 
-### 2. Р”РѕР±Р°РІРёС‚СЊ РґСЂСѓРіР°
+### Reviews_likes
+- Соединительная таблица для отзыва и лайков/дизлайков
+</details>
 
-#### addFriend(Long userId, Long friendId)
-```sql
-INSERT INTO Friends (user_id, friend_id, status_id)
-VALUE ({userId}, {friend_id}, 2);
-```
-
-```sql
-INSERT INTO Friends (user_id, friend_id, status_id)
-SELECT {userId}, {friend_id}, s.name FROM status AS s
-WHERE s.name = 'not acepted';
-```
-
-### 3. РЈРґР°Р»РёС‚СЊ РґСЂСѓРіР°
-
-#### deleteFriend(Long userId, Long friendId)
-```sql
-DELETE FROM Friends
-WHERE user_id = {userId} AND friend_id = {friend_id};
-```
-
-### 4. РќР°Р№С‚Рё РІСЃРµС… РґСЂСѓР·РµР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
-
-#### findFriends(Long userId)
-```sql
-SELECT u2.*
-FROM User AS u1
-JOIN Friends AS f ON u1.id = f.user_id
-JOIN User AS u2 ON f.friend_id = u2.id
-JOIN Status AS s ON f.status_id = s.status_id
-WHERE u1.id = {userId} AND s.status = 'accepted';
-```
-
-### 5. РќР°Р№С‚Рё РѕР±С‰РёС… РґСЂСѓР·РµР№ РґРІСѓС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
-
-#### findOther(Long userId, Long otherId)
-```sql
-SELECT u2.*
-FROM User AS u1
-JOIN Friends AS f ON u1.id = f.user_id
-JOIN User AS u2 ON f.friend_id = u2.id
-JOIN Status AS s ON f.status_id = s.status_id
-WHERE u1.id = {userId} 
-      AND s.status = 'accepted'
-      AND u2.id IN (SELECT ou2.id
-                    FROM User AS ou1
-                    JOIN Friends AS of ON ou1.id = of.user_id
-                    JOIN User AS ou2 ON of.friend_id = ou2.id
-                    JOIN Status AS os ON of.status_id = os.status_id
-                    WHERE ou1.id = {otherId} 
-                          AND os.status = 'accepted');
-```
-
-### 6. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
-
-#### getUsers()
-```sql
-SELECT * FROM User
-```
-
-### 7. РЎРѕР·РґР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
-
-#### create(User user)
-```sql
-INSERT INTO User (email, login, name, birthday)
-VALUE ({user.getEmail()}, {user.getLogin()}, {user.getName()}, {user.getBirthday()});
-```
-
-### 8. РћР±РЅРѕРІРёС‚СЊ РґР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
-
-#### update(User user)
-```sql
-UPDATE User 
-SET email = {user.getEmail()}, 
-    login = {user.getLogin()}, 
-    name = {user.getName()}, 
-    birthday = {user.getBirthday()}
-WHERE id = {user.getId()}
-```
-
-## РџСЂРёРјРµСЂС‹ Р·Р°РїСЂРѕСЃРѕРІ РЅР° СЏР·С‹РєРµ SQL РґР»СЏ РјРѕРґРµР»Рё Film
-
-### 1. РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃС‚Р°РІРёС‚ Р»Р°Р№Рє С„РёР»СЊРјСѓ
-
-#### addLike(Long filmId, Long userId) 
-```sql
-INSERT INTO Film_User (film_id, user_id)
-VALUE ({filmId}, {userId});
-```
-
-### 2. РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓРґР°Р»СЏРµС‚ Р»Р°Р№Рє СЃ С„РёР»СЊРјР°
-
-#### deleteLike(Long filmId, Long userId)
-```sql
-DELETE FROM Film_User
-WHERE film_id = {filmId} AND user_id = {userId};
-```
-
-### 3. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє N РїРѕРїСѓР»СЏСЂРЅС‹С… С„РёР»СЊРјРѕРІ
-
-#### findPopular(Integer count)
-```sql
-SELECT f.id,
-       f.name AS title,
-       f.description,
-       f.releaseDate,
-       f.duration,
-       r.name AS AMP_Rating
-FROM Film AS f
-JOIN Rating AS r ON f.rating_id = r.rating_id;
-JOIN (SELECT fu.film_id AS liked_film_id,
-             COUNT(fu.user_id) AS likes
-      FROM Film_User AS fu
-      GROUP BY fu.film_id) AS liked_films ON f.id = liked_films.liked_film_id
-ORDER BY liked_films.likes DESC
-LIMIT {count};
-```
-
-### 4. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… С„РёР»СЊРјРѕРІ
-
-#### findAll()
-```sql
-SELECT f.id,
-       f.name AS title,
-       f.description,
-       f.releaseDate,
-       f.duration,
-       r.name AS AMP_Rating
-FROM Film AS f
-LEFT JOIN Rating AS r ON f.rating_id = r.rating_id;
-```
-
-### 5. Р”РѕР±Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ С„РёР»СЊРјР°
-
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Film</span></strong></summary>
+   
+### 1. Добавить фильм 
 #### create(Film film)
 ```sql
-INSERT INTO Film (name, 
-                  description, 
-                  releaseDate, 
-                  duration, 
-                  rating)
-VALUE ({film.getName()}, 
+INSERT INTO films(name,
+                  description,
+                  releaseDate,
+                  duration,
+                  rating_id)
+VALUES ({film.getName()}, 
        {film.getDescription()}, 
        {film.getReleaseDate()}, 
        {film.getDuration()},
        {film.getRating()});
 ```
 
-### 6. РћР±РЅРѕРІРёС‚СЊ РґР°РЅРЅС‹Рµ С„РёР»СЊРјР°
-
+### 2. Обновить фильм
 #### update(Film film)
 ```sql
 UPDATE Film 
@@ -204,52 +184,271 @@ SET name = {film.getName()},
 WHERE id = {film.getId()};
 ```
 
-### 7. Р”РѕР±Р°РІРёС‚СЊ Р¶Р°РЅСЂ С„РёР»СЊРјСѓ
-
-#### addGenre(Long filmId, Long genreId)
+### 3. Найти фильм по id
+#### findFilm(Long filmId)
 ```sql
-INSERT INTO Film_Genre (film_id, genre_id)
-VALUE ({filmId}, {genreId});
+SELECT * 
+FROM films 
+WHERE id = {filmId};
 ```
 
-#### addGenre(Long filmId, String genre)
+### 4. Получить список всех фильмов
+#### Collection<Film> findAll()
 ```sql
-INSERT INTO Film_Genre (film_id, genre_id)
-SELECT {filmId}, g.genre_id
-FROM Genre AS g
-WHERE g.name = {genre};
+SELECT * 
+FROM films;
 ```
 
-### 8. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє Р»СЋРґРµР№ РїРѕСЃС‚Р°РІРёРІС€РёС… Р»Р°Р№Рє С„РёР»СЊРјСѓ
-
-#### findFilmLikers(Long filmId)
+### 5. Удалить фильм
+#### delete(Long filmId)
 ```sql
-SELECT u.name AS full_name
-FROM Film AS f
-JOIN Film_User AS fu ON f.id = fu.film_id;
-JOIN User AS u ON fu.user_id = u.id;
-WHERE f.id = {filmId};
+DELETE FROM films 
+WHERE id = {filmId};
 ```
 
-### 9. РџРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ Р»Р°Р№РєРѕРІ С„РёР»СЊРјР°
-
-#### findFilmLikesCount(Long filmId)
+### 6. Поставить лайк
+#### addLike(Film film, User user)
 ```sql
-SELECT f.name,
-       COUNT(fu.user_id) AS likes
-FROM Film AS f
-JOIN Film_User AS fu ON f.id = fu.film_id
-WHERE f.id = {filmId}
-GROUP BY f.name;
+INSERT INTO likes(film_id, user_id) 
+VALUES ({film.getId()}, {user.getId()});
 ```
 
-### 10. РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє С„РёР»СЊРјРѕРІ РєРѕС‚РѕСЂС‹Рµ Р»Р°Р№РєРЅСѓР» РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ
-
-#### findUserLikedFilms(Long userId)
+### 7. Удалить лайк
+#### deleteLike(Film film, User user)
 ```sql
-SELECT f.name
-FROM User AS u
-JOIN Film_User AS fu ON u.id = fu.user_id
-JOIN Film AS f ON fu.film_id = f.id
-WHERE u.id = {userId};
+DELETE FROM likes 
+WHERE film_id = {film.getId()} AND user_id = {user.getId()};
 ```
+
+### 8. Отобразить популярные фильмы
+#### findPopular(Integer count)
+```sql
+SELECT f.* FROM films AS f  
+LEFT JOIN (SELECT film_id, count(l.user_id) likes
+           FROM likes AS l  
+           GROUP BY l.film_id
+           ORDER BY count(l.user_id) DESC 
+           LIMIT {count})
+AS liked_films ON f.id = liked_films.film_id  
+ORDER BY liked_films.likes DESC;
+```
+
+### 9. Поиск фильмов по режиссёру
+#### findDirectorFilms(Long directorId)
+```sql
+SELECT f.* FROM films_directors AS fd 
+LEFT JOIN films AS f ON fd.film_id = f.id
+WHERE fd.director_id = {directorId};
+```
+
+### 10. Получить количество лайков у фильма
+#### getLikes(Long filmId)
+```sql
+SELECT user_id FROM likes
+WHERE film_id = {filmId};
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели User</span></strong></summary>
+   
+### 1. Добавить пользователя
+#### create(User user)
+```sql
+INSERT INTO users(email, login, name, birthday)
+VALUES ({user.getEmail()},
+        {user.getLogin()},
+        {user.getName()},
+        {user.getBirthday()});
+```
+
+### 2. Обновить пользователя
+#### update(User newUser)
+```sql
+UPDATE users
+SET email = {newUser.getEmail()},
+    login = {newUser.getLogin()},
+    name = {newUser.getName()},
+    birthday = {newUser.getBirthday()}
+WHERE id = newUser.getId();
+```
+
+### 3. Найти пользователя по id
+#### findUser(Long userId)
+```sql
+SELECT *
+FROM users WHERE id = {userId};
+```
+
+### 4. Получить список пользователей
+#### getUsers()
+```sql
+SELECT u.id, u.email, u.login, u.name, u.birthday, GROUP_CONCAT(f.friend_id) AS friends
+FROM users u  
+LEFT JOIN friends f ON u.id = f.user_id
+LEFT JOIN statuses AS s ON f.status_id = s.id AND s.name = 'Подтверждённая'
+GROUP BY u.id, u.email, u.login, u.name, u.birthday;
+```
+
+### 5. Удалить пользователя
+#### delete(Long id)
+```sql
+DELETE FROM users
+WHERE id = {id};
+```
+
+### 6. Добавить пользователя в друзья
+#### addFriend(Long userId, Long friendId)
+```sql
+INSERT INTO friends(user_id, friend_id, status_id)
+VALUES ({user_id}, {friend_id}, {status_id});
+```
+
+### 7. Удалить пользователя из друзей
+#### deleteFriend(Long userId, Long friendId)
+```sql
+DELETE FROM friends
+WHERE user_id = {userId} AND friend_id = {friendId};
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Genre</span></strong></summary>
+
+### 1. Добавить жанр
+#### create(Genre genre)
+```sql
+INSERT INTO genres(name)
+VALUES ({genre.getName()});
+```
+
+### 2. Найти жанр по id
+#### findGenre(Long genreId)
+```sql
+SELECT *
+FROM genres
+WHERE id = genreId;
+```
+
+### 3. Получить список всех жанров
+#### findAll()
+```sql
+SELECT *
+FROM genres;
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Mpa</span></strong></summary>
+
+### 1. Добавить рейтинг
+#### create(Mpa mpa)
+```sql
+INSERT INTO ratings(name, description)
+VALUES ({mpa.getName()},
+        {mpa.getDescription()});
+```
+
+### 2. Найти рейтинг по id
+#### findMpa(Long mpaId)
+```sql
+SELECT * FROM ratings
+WHERE id = {mpaId};
+```
+
+### 3. Получить список всех рейтингов
+#### findAll()
+```sql
+SELECT *
+FROM ratings;
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Review</span></strong></summary>
+
+### 1. Добавить отзыв
+#### create(Review review)
+```sql
+INSERT INTO reviews(user_id, film_id, content, isPositive, useful)
+VALUES ({review.getUserId()},
+        {review.getFilmId()},
+        {review.getContent()},
+        {review.getIsPositive()},
+        {review.getUseful()});
+```
+
+### 2. Получить список отзывов о фильме
+#### reviewsByFilmId(Long filmId, Integer count)
+```sql
+SELECT *
+FROM reviews 
+WHERE film_id = {filmId}
+LIMIT {count};
+```
+
+### 3. Поставить лайк отзыву
+#### increaseUseful(Long reviewId)
+```sql
+UPDATE reviews
+SET useful = useful + 1
+WHERE id = {reviewId};
+```
+
+### 4. Поставить дизлайк отзыву
+#### decreaseUseful(Long reviewId)
+```sql
+UPDATE reviews
+SET useful = useful - 1
+WHERE id = {reviewId};
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Director</span></strong></summary>
+
+### 1. Добавить режиссёра
+#### create(Director director)
+```sql
+INSERT INTO directors(name)
+VALUES ({director.getName});
+```
+
+### 2. Получить список режиссёров
+#### findAll()
+```sql
+SELECT *
+FROM directors;
+```
+
+### 3. Найти режиссёра по id
+#### findDirector(Long directorId)
+```sql
+SELECT * FROM directors
+WHERE id = {directorId};
+```
+
+### 4. Удалить режиссёра
+#### delete(Long directorId)
+```sql
+DELETE FROM directors
+WHERE id = {directorId};
+```
+</details>
+
+<details><summary><strong><span style="font-size: 20px;">Примеры SQL-запросов для модели Feed</span></strong></summary>
+
+### 1. Добавить событие
+#### addEvent(Feed feed)
+```sql
+INSERT INTO events (user_id, timestamp, event_type, operation, entity_id)
+VALUES ({feed.getUserId()},
+                    {feed.getTimestamp()},
+                    {feed.getEventType().name()},
+                    {feed.getOperation().name()},
+                    {feed.getEntityId()});
+```
+
+### 2. Получить историю событий пользователя по id
+#### getEventsByUserId(Long userId)
+```sql
+SELECT * FROM events
+WHERE user_id = {userId}
+ORDER BY timestamp ASC;
+```
+</details>
