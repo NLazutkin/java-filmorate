@@ -185,7 +185,6 @@ public class ReviewService {
         boolean result = reviewStorage.delete(reviewId);
 
         if (result) {
-            // Генерируем событие
             Feed feed = new Feed();
             feed.setUserId(review.getUserId());
             feed.setTimestamp(System.currentTimeMillis());
