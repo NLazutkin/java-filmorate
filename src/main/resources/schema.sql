@@ -61,6 +61,22 @@ CREATE TABLE IF NOT EXISTS films_directors (
   PRIMARY KEY (film_id, director_id)
 );
 
+CREATE TABLE IF NOT EXISTS reviews (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  film_id BIGINT NOT NULL,
+  content VARCHAR,
+  isPositive BOOLEAN,
+  useful INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS reviews_likes (
+  review_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  isLike BOOLEAN,
+  PRIMARY KEY (review_id, user_id)
+);
+
 ALTER TABLE films ADD FOREIGN KEY (rating_id) REFERENCES ratings (id);
 
 ALTER TABLE films_genres ADD FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE;
@@ -81,8 +97,10 @@ ALTER TABLE films_directors ADD FOREIGN KEY (film_id) REFERENCES films (id) ON D
 
 ALTER TABLE films_directors ADD FOREIGN KEY (director_id) REFERENCES directors (id);
 
+ALTER TABLE reviews ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 
+ALTER TABLE reviews ADD FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE;
 
+ALTER TABLE reviews_likes ADD FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE;
 
-
-
+ALTER TABLE reviews_likes ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
