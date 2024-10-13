@@ -1,7 +1,5 @@
-// src/main/java/ru/yandex/practicum/filmorate/storage/feed/FeedDbStorage.java
 package ru.yandex.practicum.filmorate.storage.feed;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +8,6 @@ import ru.yandex.practicum.filmorate.enums.query.FeedQueries;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.feed.FeedRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
 import java.util.Collection;
 
