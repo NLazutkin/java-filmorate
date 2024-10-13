@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component("InMemoryFeedStorage")
-public class InMemoryFeedStorage implements FeedStorage{
+public class InMemoryFeedStorage implements FeedStorage {
     private final List<Feed> feeds = new ArrayList<>();
     private long eventIdCounter = 0;
 
