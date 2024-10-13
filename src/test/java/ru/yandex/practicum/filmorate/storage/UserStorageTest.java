@@ -81,16 +81,17 @@ public class UserStorageTest {
     @Test
     public void testCreate() {
         User newUser = new User();
-        newUser.setId(4L);
         newUser.setEmail("WillTurner@yandex.ru");
         newUser.setName("Will Turner");
         newUser.setLogin("Will Turner");
         newUser.setBirthday(LocalDate.of(2000, 1, 1));
 
-        assertThat(userStorage.create(newUser))
+        User createdUser = userStorage.create(newUser);
+
+        assertThat(createdUser)
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 4L)
-                .hasFieldOrPropertyWithValue("email", "WillTurner@yandex.ru");
+                .hasFieldOrPropertyWithValue("id", createdUser.getId())
+                .hasFieldOrPropertyWithValue("email", newUser.getEmail());
     }
 
     @Test

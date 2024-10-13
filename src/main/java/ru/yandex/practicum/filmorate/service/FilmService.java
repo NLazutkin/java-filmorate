@@ -71,7 +71,6 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(film, mpa, genres, likes, directors);
     }
 
-
     public FilmDto findFilm(Long filmId) {
         log.debug(String.format("Поиск фильма с ID %d", filmId));
 
@@ -290,4 +289,3 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 }
-

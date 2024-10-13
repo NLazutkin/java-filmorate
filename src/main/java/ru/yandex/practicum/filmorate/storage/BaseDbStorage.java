@@ -24,6 +24,14 @@ public class BaseDbStorage<T> {
         return jdbc.queryForObject(query, Long.class, params);
     }
 
+    public Optional<Integer> isExist(String query, Object... params) {
+        try {
+            return Optional.ofNullable(jdbc.queryForObject(query, Integer.class, params));
+        } catch (EmptyResultDataAccessException ignored) {
+            return Optional.empty();
+        }
+    }
+
     protected Optional<T> findOne(String query, RowMapper<T> mapper, Object... params) {
         try {
             T result = jdbc.queryForObject(query, mapper, params);
