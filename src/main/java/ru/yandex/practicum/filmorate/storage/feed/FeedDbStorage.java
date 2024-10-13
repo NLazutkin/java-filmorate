@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.feed;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.query.FeedQueries;
@@ -13,6 +16,8 @@ import java.util.Collection;
 
 @Slf4j
 @Component("FeedDbStorage")
+@Primary
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class FeedDbStorage extends BaseDbStorage<Feed> implements FeedStorage {
     private final FeedRowMapper feedRowMapper;
 

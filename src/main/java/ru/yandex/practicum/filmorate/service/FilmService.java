@@ -41,7 +41,7 @@ public class FilmService {
                        @Qualifier("MpaDbStorage"/*"InMemoryMpaStorage"*/) MpaStorage mpaStorage,
                        @Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage,
                        @Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage directorStorage,
-                       @Qualifier("FeedDbStorage") FeedStorage feedStorage) {
+                       @Qualifier("FeedDbStorage"/*InMemoryFeedStorage*/) FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;

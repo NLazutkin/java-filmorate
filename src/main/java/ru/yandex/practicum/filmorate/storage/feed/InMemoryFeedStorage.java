@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.feed;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
 
@@ -9,13 +11,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component("InMemoryFeedStorage")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryFeedStorage implements FeedStorage {
+
     private final List<Feed> feeds = new ArrayList<>();
-    private long eventIdCounter = 0;
+
+    private long getNextId() {
+        long currentMaxId = feeds.stream()
+                .mapToLong(Feed::getEventId)
+                .max()
+                .orElse(0);
+        return currentMaxId + 1;
+    }
 
     @Override
     public void addEvent(Feed feed) {
-        feed.setEventId(++eventIdCounter);
+        feed.setEventId(getNextId());
         feeds.add(feed);
     }
 

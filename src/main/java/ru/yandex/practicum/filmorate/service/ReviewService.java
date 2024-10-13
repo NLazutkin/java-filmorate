@@ -39,7 +39,7 @@ public class ReviewService {
                          @Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
                          @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
                          @Qualifier("EstimationDbStorage"/*"InMemoryEstimationStorage"*/) EstimationStorage estimationStorage,
-                         @Qualifier("FeedDbStorage") FeedStorage feedStorage) {
+                         @Qualifier("FeedDbStorage"/*InMemoryFeedStorage*/) FeedStorage feedStorage) {
         this.reviewStorage = reviewStorage;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
