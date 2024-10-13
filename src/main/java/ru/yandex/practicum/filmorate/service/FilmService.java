@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.*;
+import ru.yandex.practicum.filmorate.enums.query.EventType;
+import ru.yandex.practicum.filmorate.enums.query.OperationType;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
@@ -30,18 +33,21 @@ public class FilmService {
     MpaStorage mpaStorage;
     GenreStorage genreStorage;
     DirectorStorage directorStorage;
+    FeedStorage feedStorage;
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
                        @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
                        @Qualifier("MpaDbStorage"/*"InMemoryMpaStorage"*/) MpaStorage mpaStorage,
                        @Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage,
-                       @Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage directorStorage) {
+                       @Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage directorStorage,
+                       @Qualifier("FeedDbStorage"/*InMemoryFeedStorage*/) FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
         this.genreStorage = genreStorage;
         this.directorStorage = directorStorage;
+        this.feedStorage = feedStorage;
     }
 
     protected FilmDto fillFilmData(Film film) {
@@ -120,6 +126,15 @@ public class FilmService {
         filmStorage.addLike(film, user);
 
         log.debug(String.format("Пользователь %s ставит лайк фильму %s", user.getName(), film.getName()));
+
+        Feed feed = new Feed();
+        feed.setUserId(userId);
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.LIKE);
+        feed.setOperation(OperationType.ADD);
+        feed.setEntityId(filmId);
+
+        feedStorage.addEvent(feed);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -131,6 +146,15 @@ public class FilmService {
         filmStorage.deleteLike(film, user);
 
         log.debug(String.format("Пользователь %s убирает лайк с фильма %s", user.getName(), film.getName()));
+
+        Feed feed = new Feed();
+        feed.setUserId(userId);
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.LIKE);
+        feed.setOperation(OperationType.REMOVE);
+        feed.setEntityId(filmId);
+
+        feedStorage.addEvent(feed);
     }
 
     public Collection<FilmDto> findDirectorFilms(Long directorId, String sortConditions) {
