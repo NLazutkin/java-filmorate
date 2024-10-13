@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewRequest;
 import ru.yandex.practicum.filmorate.dto.review.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewRequest;
+import ru.yandex.practicum.filmorate.enums.query.EventType;
+import ru.yandex.practicum.filmorate.enums.query.OperationType;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.estimation.EstimationStorage;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -29,16 +32,19 @@ public class ReviewService {
     FilmStorage filmStorage;
     UserStorage userStorage;
     EstimationStorage estimationStorage;
+    FeedStorage feedStorage;
 
     @Autowired
     public ReviewService(@Qualifier("ReviewDbStorage"/*"InMemoryReviewStorage"*/) ReviewStorage reviewStorage,
                          @Qualifier("FilmDbStorage"/*"InMemoryFilmStorage"*/) FilmStorage filmStorage,
                          @Qualifier("UserDbStorage"/*"InMemoryUserStorage"*/) UserStorage userStorage,
-                         @Qualifier("EstimationDbStorage"/*"InMemoryEstimationStorage"*/) EstimationStorage estimationStorage) {
+                         @Qualifier("EstimationDbStorage"/*"InMemoryEstimationStorage"*/) EstimationStorage estimationStorage,
+                         @Qualifier("FeedDbStorage") FeedStorage feedStorage) {
         this.reviewStorage = reviewStorage;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.estimationStorage = estimationStorage;
+        this.feedStorage = feedStorage;
     }
 
     public ReviewDto findReview(Long reviewId) {
@@ -138,6 +144,14 @@ public class ReviewService {
 
         Review createdReview = reviewStorage.create(review);
 
+        Feed feed = new Feed();
+        feed.setUserId(review.getUserId());
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.REVIEW);
+        feed.setOperation(OperationType.ADD);
+        feed.setEntityId(createdReview.getReviewId());
+        feedStorage.addEvent(feed);
+
         log.trace("Отзыв пользователя {} о фильме {} сохранен под номером {}",
                 user.getName(), film.getName(), createdReview.getReviewId());
         return ReviewMapper.mapToReviewDto(createdReview);
@@ -153,12 +167,34 @@ public class ReviewService {
         Review updatedReview = ReviewMapper.updateReviewFields(reviewStorage.findReview(request.getReviewId()), request);
         updatedReview = reviewStorage.update(updatedReview);
 
+        Feed feed = new Feed();
+        feed.setUserId(updatedReview.getUserId());
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.REVIEW);
+        feed.setOperation(OperationType.UPDATE);
+        feed.setEntityId(updatedReview.getReviewId());
+        feedStorage.addEvent(feed);
+
+
         return ReviewMapper.mapToReviewDto(updatedReview);
     }
 
     public boolean delete(Long reviewId) {
         Review review = reviewStorage.findReview(reviewId);
         log.debug("Удаляем данные отзыва №{}", review.getReviewId());
-        return reviewStorage.delete(reviewId);
+        boolean result = reviewStorage.delete(reviewId);
+
+        if (result) {
+            // Генерируем событие
+            Feed feed = new Feed();
+            feed.setUserId(review.getUserId());
+            feed.setTimestamp(System.currentTimeMillis());
+            feed.setEventType(EventType.REVIEW);
+            feed.setOperation(OperationType.REMOVE);
+            feed.setEntityId(review.getReviewId());
+            feedStorage.addEvent(feed);
+        }
+
+        return result;
     }
 }
