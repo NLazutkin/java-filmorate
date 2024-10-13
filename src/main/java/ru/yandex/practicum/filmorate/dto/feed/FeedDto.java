@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.yandex.practicum.filmorate.enums.query.EventType;
-import ru.yandex.practicum.filmorate.enums.query.OperationType;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 
 
 @Data

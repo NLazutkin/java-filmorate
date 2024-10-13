@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -157,25 +156,45 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addGenreId(Genre genre, Film film) {
-        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(film.getId()));
+    public void addGenreId(Long genreId, Long filmId) {
+        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(filmId));
         LinkedHashSet<Long> genresIds = new LinkedHashSet<>();
         if (filmGenresIds.isPresent()) {
             genresIds = filmGenresIds.get();
         }
-        genresIds.add(genre.getId());
-        filmsGenresIds.put(film.getId(), genresIds);
+        genresIds.add(genreId);
+        filmsGenresIds.put(filmId, genresIds);
     }
 
     @Override
-    public void addDirectorId(Director director, Film film) {
-        Optional<LinkedHashSet<Long>> filmDirectorsIds = Optional.ofNullable(filmsDirectorsIds.get(film.getId()));
+    public void addDirectorId(Long directorId, Long filmId) {
+        Optional<LinkedHashSet<Long>> filmDirectorsIds = Optional.ofNullable(filmsDirectorsIds.get(filmId));
         LinkedHashSet<Long> directorsIds = new LinkedHashSet<>();
         if (filmDirectorsIds.isPresent()) {
             directorsIds = filmDirectorsIds.get();
         }
-        directorsIds.add(director.getId());
-        filmsDirectorsIds.put(film.getId(), directorsIds);
+        directorsIds.add(directorId);
+        filmsDirectorsIds.put(filmId, directorsIds);
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId) {
+        return Optional.ofNullable(filmsGenresIds.remove(filmId)).isPresent();
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId) {
+        return Optional.ofNullable(filmsDirectorsIds.remove(filmId)).isPresent();
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId, Long genreId) {
+        return filmsGenresIds.get(filmId).remove(genreId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId, Long directorId) {
+        return filmsDirectorsIds.get(filmId).remove(directorId);
     }
 
     @Override

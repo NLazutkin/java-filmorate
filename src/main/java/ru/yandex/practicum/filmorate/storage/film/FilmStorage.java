@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -31,9 +29,17 @@ public interface FilmStorage {
 
     void deleteLike(Film film, User user);
 
-    void addGenreId(Genre genre, Film film);
+    void addGenreId(Long genreId, Long filmId);
 
-    void addDirectorId(Director director, Film film);
+    void addDirectorId(Long directorId, Long filmId);
+
+    boolean deleteGenreIds(Long filmId);
+
+    boolean deleteDirectorIds(Long filmId);
+
+    boolean deleteGenreIds(Long filmId, Long genreId);
+
+    boolean deleteDirectorIds(Long filmId, Long directorId);
 
     LinkedHashSet<Long> findGenresIds(Long filmId);
 

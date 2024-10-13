@@ -91,7 +91,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public User update(User newUser) {
         update(UserQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные пользователя", newUser.getEmail(),
-                newUser.getEmail(), newUser.getName(), newUser.getBirthday(), newUser.getId());
+                newUser.getLogin(), newUser.getName(), newUser.getBirthday(), newUser.getId());
         return newUser;
     }
 

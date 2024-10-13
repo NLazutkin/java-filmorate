@@ -40,10 +40,6 @@ public final class ReviewMapper {
 
         review.setIsPositive(request.getIsPositive());
 
-        if (request.hasUseful()) {
-            review.setUseful(request.getUseful());
-        }
-
         return review;
     }
 }

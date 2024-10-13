@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.*;
-import ru.yandex.practicum.filmorate.enums.query.EventType;
-import ru.yandex.practicum.filmorate.enums.query.OperationType;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.*;
@@ -19,10 +19,10 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 @Slf4j
 @Service
@@ -179,7 +179,7 @@ public class FilmService {
     }
 
     public FilmDto create(NewFilmRequest request) {
-        log.debug("Создаем запись о фильме {}", request.getName());
+        log.debug(String.format("Создаем запись о фильме %s", request.getName()));
         Film film = FilmMapper.mapToFilm(request);
 
         if (film.getMpa().getId() != null) {
@@ -190,15 +190,15 @@ public class FilmService {
 
         Collection<Genre> genres = film.getGenres().stream()
                 .map(genreStorage::findGenre)
-                .peek(genre -> filmStorage.addGenreId(genre, createdfilm))
+                .peek(genre -> filmStorage.addGenreId(genre.getId(), createdfilm.getId()))
                 .toList();
 
         Collection<Director> directors = film.getDirectors().stream()
                 .map(directorStorage::findDirector)
-                .peek(director -> filmStorage.addDirectorId(director, createdfilm))
+                .peek(director -> filmStorage.addDirectorId(director.getId(), createdfilm.getId()))
                 .toList();
 
-        log.trace("Фильм {} сохранен!", createdfilm.getName());
+        log.trace(String.format("Фильм %s сохранен!", createdfilm.getName()));
         return FilmMapper.mapToFilmDto(createdfilm);
     }
 
@@ -213,19 +213,48 @@ public class FilmService {
         updatedFilm = filmStorage.update(updatedFilm);
 
         Film finalUpdatedFilm = updatedFilm;
-        LinkedHashSet<Long> directorsIds = filmStorage.findDirectorsIds(updatedFilm.getId());
-        Collection<Director> directors = updatedFilm.getDirectors().stream()
-                .map(directorStorage::findDirector)
-                .filter(director -> !directorsIds.contains(director.getId()))
-                .peek(director -> filmStorage.addDirectorId(director, finalUpdatedFilm))
-                .toList();
 
-        LinkedHashSet<Long> genresIds = filmStorage.findGenresIds(updatedFilm.getId());
-        Collection<Genre> genres = updatedFilm.getGenres().stream()
-                .map(genreStorage::findGenre)
-                .filter(genre -> !genresIds.contains(genre.getId()))
-                .peek(genre -> filmStorage.addGenreId(genre, finalUpdatedFilm))
-                .toList();
+        if (finalUpdatedFilm.getDirectors().isEmpty()) {
+            boolean bResult = filmStorage.deleteDirectorIds(finalUpdatedFilm.getId());
+        } else {
+            LinkedHashSet<Long> savedDirectorsIds = filmStorage.findDirectorsIds(finalUpdatedFilm.getId());
+            LinkedHashSet<Long> inputDirectorsIds = finalUpdatedFilm.getDirectors().stream()
+                    .map(Director::getId)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+            LinkedHashSet<Long> result = Stream.concat(savedDirectorsIds.stream(), inputDirectorsIds.stream())
+                    .filter(element -> !(savedDirectorsIds.contains(element) && inputDirectorsIds.contains(element)))
+                    .peek(directorId -> {
+                        if (savedDirectorsIds.contains(directorId)) {
+                            filmStorage.deleteDirectorIds(finalUpdatedFilm.getId(), directorId);
+                        } else {
+                            filmStorage.addDirectorId(directorId, finalUpdatedFilm.getId());
+                        }
+                    }).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+
+        if (finalUpdatedFilm.getGenres().isEmpty()) {
+            boolean bResult = filmStorage.deleteGenreIds(finalUpdatedFilm.getId());
+        } else {
+            LinkedHashSet<Long> savedGenresIds = filmStorage.findGenresIds(finalUpdatedFilm.getId());
+            LinkedHashSet<Long> inputGenresIds = finalUpdatedFilm.getGenres().stream()
+                    .map(Genre::getId)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+            LinkedHashSet<Long> result = Stream.concat(savedGenresIds.stream(), inputGenresIds.stream())
+                    .filter(element -> !(savedGenresIds.contains(element) && inputGenresIds.contains(element)))
+                    .peek(genreId -> {
+                        if (savedGenresIds.contains(genreId)) {
+                            filmStorage.deleteGenreIds(finalUpdatedFilm.getId(), genreId);
+                        } else {
+                            filmStorage.addGenreId(genreId, finalUpdatedFilm.getId());
+                        }
+                    }).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+
+        if (updatedFilm.getMpa().getId() != null) {
+            Mpa mpa = mpaStorage.findMpa(updatedFilm.getMpa());
+        }
 
         return FilmMapper.mapToFilmDto(updatedFilm);
     }

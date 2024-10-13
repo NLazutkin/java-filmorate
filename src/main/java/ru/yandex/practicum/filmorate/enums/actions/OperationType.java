@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.enums.query;
+package ru.yandex.practicum.filmorate.enums.actions;
 
 public enum OperationType {
     ADD,

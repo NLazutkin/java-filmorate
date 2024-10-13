@@ -39,8 +39,7 @@ CREATE TABLE IF NOT EXISTS films_genres (
 
 CREATE TABLE IF NOT EXISTS likes (
   film_id BIGINT NOT NULL,
-  user_id BIGINT NOT NULL,
-  PRIMARY KEY (film_id, user_id)
+  user_id BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS friends (
@@ -106,7 +105,7 @@ ALTER TABLE events ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CAS
 
 ALTER TABLE films_directors ADD FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE;
 
-ALTER TABLE films_directors ADD FOREIGN KEY (director_id) REFERENCES directors (id);
+ALTER TABLE films_directors ADD FOREIGN KEY (director_id) REFERENCES directors (id) ON DELETE CASCADE;
 
 ALTER TABLE reviews ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 

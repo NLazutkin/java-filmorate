@@ -24,6 +24,8 @@ TRUNCATE TABLE STATUSES RESTART IDENTITY;
 
 TRUNCATE TABLE REVIEWS RESTART IDENTITY;
 
+TRUNCATE TABLE EVENTS RESTART IDENTITY;
+
 SET REFERENTIAL_INTEGRITY TRUE;
 
 INSERT INTO RATINGS (NAME, DESCRIPTION)
@@ -44,57 +46,3 @@ VALUES ('Комедия'), 		-- 1
 INSERT INTO STATUSES (NAME)
 VALUES ('Подтверждённая'), 		-- 1
 		('Неподтверждённая'); 	-- 2
-
-INSERT INTO FILMS (NAME , DESCRIPTION , RELEASEDATE , DURATION , RATING_ID)
-VALUES ('Тень', '30-ые годы XX века, город Нью-Йорк...', '1994-07-01', 108 , 3),
-		('Звёздные войны: Эпизод 4 – Новая надежда', 'Татуин. Планета-пустыня. Уже постаревший рыцарь Джедай ...', '1997-05-25', 121 , 2),
-		('Зеленая миля', 'Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора» ...', '1999-12-06', 189 , 4),
-		('Гадкий я', 'Гадкий снаружи, но добрый внутри Грю намерен, тем не менее, ...', '2010-06-27', 95 , 2);
-
-INSERT INTO USERS (EMAIL , LOGIN , NAME , BIRTHDAY)
-VALUES ('Capitan@yandex.ru', 'Capitan', 'Capitan', '2001-01-01'), 	-- 1
-		('Jack@yandex.ru', 'Jack', 'Jack', '2002-02-02'), 			-- 2
-		('Sparrow@yandex.ru', 'Sparrow', 'Sparrow', '2003-03-03'); 	-- 3
-
-INSERT INTO DIRECTORS (NAME)
-VALUES ('Джордж Лукас'), 	-- 1
-		('Фрэнк Дарабонт'), -- 2
-		('Рассел Малкэй'),	-- 3
-		('Пьер Коффан'),	-- 4
-		('Крис Рено');		-- 5
-
-INSERT INTO REVIEWS (USER_ID , FILM_ID , CONTENT , ISPOSITIVE , USEFUL)
-VALUES (1, 4, 'Хороший отзыв', TRUE, 2),        -- 1
-		(2, 3, 'Очень хороший отзыв', TRUE, 0), -- 2
-		(3, 2, 'Отзыв', FALSE, 1),              -- 3
-		(3, 1, 'Плохой отзыв', FALSE, -2),      -- 4
-        (2, 4, 'Очень плохой отзыв', FALSE, 2);  -- 5
-
-INSERT INTO LIKES (FILM_ID, USER_ID)
-VALUES (1, 1), (1, 3),
-		(2, 1), (2, 2), (2, 3),
-		(3, 2),
-		(4, 1), (4, 2), (4, 3);
-
-INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS_ID)
-VALUES (1, 2, 1), (1, 3, 1),
-		(2, 1, 2),
-		(3, 1, 2), (3, 2, 1);
-
-INSERT INTO FILMS_GENRES (FILM_ID, GENRE_ID)
-VALUES (1, 2), (1, 4), (1, 6),
-		(2, 2), (2, 4), (2, 6),
-		(3, 1), (3, 2), (3, 4),
-		(4, 1), (4, 3), (4, 4), (4, 6);
-
-INSERT INTO FILMS_DIRECTORS (FILM_ID, DIRECTOR_ID)
-VALUES (1, 1), (1, 3),
-        (2, 1),
-        (3, 2),
-        (4, 4), (4, 5);
-
-INSERT INTO REVIEWS_LIKES (REVIEW_ID, USER_ID, ISLIKE)
-VALUES (1, 2, TRUE), (1, 3, TRUE),
-		(2, 1, TRUE), (2, 3, FALSE),
-		(3, 1, TRUE),
-		(4, 1, FALSE), (4, 2, FALSE);

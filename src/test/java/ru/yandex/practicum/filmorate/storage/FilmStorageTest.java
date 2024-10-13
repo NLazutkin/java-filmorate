@@ -149,7 +149,7 @@ class FilmStorageTest {
         genre.setId(2L);
         genre.setName("Драма");
 
-        filmStorage.addGenreId(genre, film);
+        filmStorage.addGenreId(genre.getId(), film.getId());
 
         assertThat(filmStorage.findGenresIds(4L))
                 .isNotEmpty()
