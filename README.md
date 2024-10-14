@@ -111,7 +111,7 @@
 
 ## ER-диаграмма
 
-![Схема базы данных проекта Filmorate](/assets/images/Filmorate.png)
+![Схема базы данных проекта Filmorate](/assets/images/Filmorate_final.png)
 
 <details><summary><strong><span style="font-size: 20px;">Пояснения к таблицам БД</span></strong></summary>
    
@@ -146,7 +146,7 @@
 - Соединительная таблица для фильма и его режиссёра
 
 ### Feeds
-- Информация о последних событиях на платформе
+- Информация о последних событиях на платформе 
 
 ### Reviews
 - Информация об отзыве к фильму
