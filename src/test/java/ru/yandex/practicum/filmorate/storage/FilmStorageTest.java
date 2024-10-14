@@ -348,7 +348,7 @@ class FilmStorageTest {
 
     @Test
     public void testDeleteAllGenreIds() {
-        filmStorage.deleteGenreIds(4L);
+        boolean result = filmStorage.deleteGenreIds(4L);
 
         assertThat(filmStorage.findGenresIds(4L))
                 .isEmpty();
@@ -356,7 +356,7 @@ class FilmStorageTest {
 
     @Test
     public void testDeleteAllDirectorIds() {
-        filmStorage.deleteDirectorIds(4L);
+        boolean result = filmStorage.deleteDirectorIds(4L);
 
         assertThat(filmStorage.findDirectorsIds(4L))
                 .isEmpty();
@@ -370,7 +370,7 @@ class FilmStorageTest {
                 .hasSize(4)
                 .containsOnly(1L, 3L, 4L, 6L);
 
-        filmStorage.deleteGenreIds(4L, 6L);
+        boolean result = filmStorage.deleteGenreIds(4L, 6L);
 
         assertThat(filmStorage.findGenresIds(4L))
                 .isNotEmpty()
@@ -387,7 +387,7 @@ class FilmStorageTest {
                 .hasSize(2)
                 .containsOnly(4L, 5L);
 
-        filmStorage.deleteDirectorIds(4L, 5L);
+        boolean result = filmStorage.deleteDirectorIds(4L, 5L);
 
         assertThat(filmStorage.findDirectorsIds(4L))
                 .isNotEmpty()

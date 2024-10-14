@@ -81,6 +81,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean delete(Long userId) {
         users.remove(userId);
+        users.values().forEach(user -> user.getFriends().remove(userId));
         return Optional.ofNullable(users.get(userId)).isPresent();
     }
 }

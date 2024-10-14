@@ -81,7 +81,6 @@ public class InMemoryReviewStorage implements ReviewStorage {
     @Override
     public boolean delete(Long reviewId) {
         reviews.remove(reviewId);
-
-        return Optional.ofNullable(reviews.get(reviewId)).isPresent();
+        return Optional.ofNullable(reviews.get(reviewId)).isEmpty();
     }
 }

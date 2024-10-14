@@ -41,7 +41,7 @@ public class FilmService {
                        @Qualifier("MpaDbStorage"/*"InMemoryMpaStorage"*/) MpaStorage mpaStorage,
                        @Qualifier("GenreDbStorage"/*"InMemoryGenreStorage"*/) GenreStorage genreStorage,
                        @Qualifier("DirectorDbStorage"/*"InMemoryDirectorStorage"*/) DirectorStorage directorStorage,
-                       @Qualifier("FeedDbStorage"/*InMemoryFeedStorage*/) FeedStorage feedStorage) {
+                       @Qualifier("FeedDbStorage"/*"InMemoryFeedStorage"*/) FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
@@ -84,13 +84,12 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-
     public Collection<FilmDto> findPopular(Integer count, Long genreId, Integer year) {
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
 
-        Collection<Film> films = new ArrayList<>();
+        Collection<Film> films;
 
         if (genreId != null && year != null) {
             log.debug("Проверка на наличие жанра");
@@ -179,7 +178,7 @@ public class FilmService {
     }
 
     public FilmDto create(NewFilmRequest request) {
-        log.debug(String.format("Создаем запись о фильме %s", request.getName()));
+        log.debug("Создаем запись о фильме {}", request.getName());
         Film film = FilmMapper.mapToFilm(request);
 
         if (film.getMpa().getId() != null) {
@@ -188,17 +187,15 @@ public class FilmService {
 
         Film createdfilm = filmStorage.create(film);
 
-        Collection<Genre> genres = film.getGenres().stream()
+        film.getGenres().stream()
                 .map(genreStorage::findGenre)
-                .peek(genre -> filmStorage.addGenreId(genre.getId(), createdfilm.getId()))
-                .toList();
+                .forEach(genre -> filmStorage.addGenreId(genre.getId(), createdfilm.getId()));
 
-        Collection<Director> directors = film.getDirectors().stream()
+        film.getDirectors().stream()
                 .map(directorStorage::findDirector)
-                .peek(director -> filmStorage.addDirectorId(director.getId(), createdfilm.getId()))
-                .toList();
+                .forEach(director -> filmStorage.addDirectorId(director.getId(), createdfilm.getId()));
 
-        log.trace(String.format("Фильм %s сохранен!", createdfilm.getName()));
+        log.trace("Фильм {} сохранен!", createdfilm.getName());
         return FilmMapper.mapToFilmDto(createdfilm);
     }
 
@@ -222,15 +219,15 @@ public class FilmService {
                     .map(Director::getId)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
-            LinkedHashSet<Long> result = Stream.concat(savedDirectorsIds.stream(), inputDirectorsIds.stream())
+            Stream.concat(savedDirectorsIds.stream(), inputDirectorsIds.stream())
                     .filter(element -> !(savedDirectorsIds.contains(element) && inputDirectorsIds.contains(element)))
-                    .peek(directorId -> {
+                    .forEach(directorId -> {
                         if (savedDirectorsIds.contains(directorId)) {
                             filmStorage.deleteDirectorIds(finalUpdatedFilm.getId(), directorId);
                         } else {
                             filmStorage.addDirectorId(directorId, finalUpdatedFilm.getId());
                         }
-                    }).collect(Collectors.toCollection(LinkedHashSet::new));
+                    });
         }
 
         if (finalUpdatedFilm.getGenres().isEmpty()) {
@@ -241,15 +238,15 @@ public class FilmService {
                     .map(Genre::getId)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
-            LinkedHashSet<Long> result = Stream.concat(savedGenresIds.stream(), inputGenresIds.stream())
+            Stream.concat(savedGenresIds.stream(), inputGenresIds.stream())
                     .filter(element -> !(savedGenresIds.contains(element) && inputGenresIds.contains(element)))
-                    .peek(genreId -> {
+                    .forEach(genreId -> {
                         if (savedGenresIds.contains(genreId)) {
                             filmStorage.deleteGenreIds(finalUpdatedFilm.getId(), genreId);
                         } else {
                             filmStorage.addGenreId(genreId, finalUpdatedFilm.getId());
                         }
-                    }).collect(Collectors.toCollection(LinkedHashSet::new));
+                    });
         }
 
         if (updatedFilm.getMpa().getId() != null) {
