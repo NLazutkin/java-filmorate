@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.storage.mappers.feed;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.enums.query.EventType;
-import ru.yandex.practicum.filmorate.enums.query.OperationType;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 import ru.yandex.practicum.filmorate.model.Feed;
 
 import java.sql.ResultSet;

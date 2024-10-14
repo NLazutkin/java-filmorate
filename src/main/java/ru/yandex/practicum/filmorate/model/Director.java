@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Director {
     Long id;
-    @NotNull(message = "Имя режиссера не должно быть пустым")
+    @NotBlank(message = "Имя режиссера не должно быть пустым")
     String name;
 }

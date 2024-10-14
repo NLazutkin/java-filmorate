@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewRequest;
 import ru.yandex.practicum.filmorate.dto.review.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewRequest;
-import ru.yandex.practicum.filmorate.enums.query.EventType;
-import ru.yandex.practicum.filmorate.enums.query.OperationType;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.*;
@@ -20,8 +20,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,6 +57,7 @@ public class ReviewService {
 
         return reviewStorage.reviewsByFilmId(filmId, count).stream()
                 .map(ReviewMapper::mapToReviewDto)
+                .sorted(Comparator.comparingInt(ReviewDto::getUseful).reversed())
                 .collect(Collectors.toList());
     }
 

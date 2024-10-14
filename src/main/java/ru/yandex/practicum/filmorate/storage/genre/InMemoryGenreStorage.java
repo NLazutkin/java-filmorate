@@ -67,7 +67,7 @@ public class InMemoryGenreStorage implements GenreStorage {
     @Override
     public Genre update(Genre newGenre) {
         genres.put(newGenre.getId(), newGenre);
-        log.trace(String.format("Данные о жанре %s обновлены!", newGenre.getName()));
+        log.trace("Данные о жанре {} обновлены!", newGenre.getName());
         return newGenre;
     }
 

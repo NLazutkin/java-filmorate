@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum EstimationQueries {
     INSERT_ESTIMATION_QUERY("INSERT INTO reviews_likes(review_id, user_id, isLike)VALUES (?, ?, ?)"),
 
@@ -9,7 +13,7 @@ public enum EstimationQueries {
 
     DELETE_ESTIMATION_QUERY("DELETE FROM reviews_likes WHERE review_id = ? AND user_id = ? AND isLike = ?");
 
-    private final String query;
+    String query;
 
     EstimationQueries(String query) {
         this.query = query;

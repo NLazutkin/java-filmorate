@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum ReviewQueries {
     INSERT_REVIEW_QUERY("INSERT INTO reviews(user_id, film_id, content, isPositive, useful)VALUES (?, ?, ?, ?, ?)"),
 
@@ -19,7 +23,7 @@ public enum ReviewQueries {
 
     DECREASE_USEFUL_QUERY("UPDATE reviews SET useful = useful - 1 WHERE id = ?");
 
-    private final String query;
+    String query;
 
     ReviewQueries(String query) {
         this.query = query;

@@ -67,7 +67,7 @@ public class InMemoryMpaStorage implements MpaStorage {
     @Override
     public Mpa update(Mpa newMpa) {
         mpas.put(newMpa.getId(), newMpa);
-        log.trace(String.format("Данные о рейтинге %s обновлены!", newMpa.getName()));
+        log.trace("Данные о рейтинге {} обновлены!", newMpa.getName());
         return newMpa;
     }
 

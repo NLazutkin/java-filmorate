@@ -67,7 +67,7 @@ public class DirectorService {
 
     public boolean delete(Long directorId) {
         Director director = directorStorage.findDirector(directorId);
-        log.debug(String.format("Удаляем данные режиссера %s", director.getName()));
+        log.debug("Удаляем данные режиссера {}", director.getName());
         return directorStorage.delete(directorId);
     }
 }

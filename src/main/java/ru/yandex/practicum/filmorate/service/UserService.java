@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
-import ru.yandex.practicum.filmorate.enums.query.EventType;
-import ru.yandex.practicum.filmorate.enums.query.OperationType;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
@@ -37,8 +37,9 @@ public class UserService {
 
     @Autowired
     public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage,
-                       @Qualifier("FilmDbStorage") FilmStorage filmStorage, FilmService filmService,
-                       @Qualifier("FeedDbStorage") FeedStorage feedStorage) {
+                       @Qualifier(/*"InMemoryFilmStorage"*/"FilmDbStorage") FilmStorage filmStorage,
+                       @Qualifier(/*"InMemoryFeedStorage"*/"FeedDbStorage") FeedStorage feedStorage,
+                       FilmService filmService) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
         this.filmService = filmService;
@@ -52,7 +53,7 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.addFriend(userId, friendId);
 
-        log.debug(String.format("Добавляем %s в список друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Добавляем {} в список друзей {}", names.getSecond(), names.getFirst());
 
         Feed feed = new Feed();
         feed.setUserId(userId);
@@ -67,7 +68,7 @@ public class UserService {
     public void deleteFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.deleteFriend(userId, friendId);
 
-        log.debug(String.format("Удаляем %s из списка друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Удаляем {} из списка друзей {}", names.getSecond(), names.getFirst());
 
         Feed feed = new Feed();
         feed.setUserId(userId);
@@ -137,7 +138,7 @@ public class UserService {
 
     public boolean delete(Long filmId) {
         User user = userStorage.findUser(filmId);
-        log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
+        log.debug("Удаляем данные пользователя {}", user.getName());
         return userStorage.delete(filmId);
     }
 

@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.query.FilmQueries;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
@@ -112,27 +110,47 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public void addGenreId(Genre genre, Film film) {
-        String errMsg = String.format("Для фильма %s не удалось установить жанр %s", film.getName(), genre.getName());
+    public void addGenreId(Long genreId, Long filmId) {
+        String errMsg = String.format("Для фильма с ID%d не удалось установить жанр с ID%d", filmId, genreId);
 
         try {
-            update(FilmQueries.INSERT_FILM_GENRE_QUERY.toString(), errMsg, film.getId(), genre.getId());
+            update(FilmQueries.INSERT_FILM_GENRE_QUERY.toString(), errMsg, filmId, genreId);
         } catch (SQLWarningException e) {
-            throw new DuplicatedDataException(String.format("Для фильма %s жанр %s уже установлен. %s",
-                    film.getName(), genre.getName(), e.getSQLWarning()));
+            throw new DuplicatedDataException(String.format("Для фильма с ID%d жанр с ID%d уже установлен. %s",
+                    filmId, genreId, e.getSQLWarning()));
         }
     }
 
     @Override
-    public void addDirectorId(Director director, Film film) {
-        String errMsg = String.format("Для фильма %s не удалось установить режиссера %s", film.getName(), director.getName());
+    public void addDirectorId(Long directorId, Long filmId) {
+        String errMsg = String.format("Для фильма с ID%d не удалось установить режиссера с ID %d", filmId, directorId);
 
         try {
-            update(FilmQueries.INSERT_FILM_DIRECTOR_QUERY.toString(), errMsg, film.getId(), director.getId());
+            update(FilmQueries.INSERT_FILM_DIRECTOR_QUERY.toString(), errMsg, filmId, directorId);
         } catch (SQLWarningException e) {
-            throw new DuplicatedDataException(String.format("Для фильма %s режиссер %s уже установлен. %s",
-                    film.getName(), director.getName(), e.getSQLWarning()));
+            throw new DuplicatedDataException(String.format("Для фильма с ID%d режиссер с ID%d уже установлен. %s",
+                    filmId, directorId, e.getSQLWarning()));
         }
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId) {
+        return delete(FilmQueries.DELETE_FILM_GENRE_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId, Long genreId) {
+        return delete(FilmQueries.DELETE_FILM_GENRE_BY_IDS_QUERY.toString(), filmId, genreId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId) {
+        return delete(FilmQueries.DELETE_FILM_DIRECTOR_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId, Long directorId) {
+        return delete(FilmQueries.DELETE_FILM_DIRECTOR_BY_IDS_QUERY.toString(), filmId, directorId);
     }
 
     @Override
@@ -163,7 +181,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Film update(Film newFilm) {
         update(FilmQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные фильма", newFilm.getName(),
-                newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getId());
+                newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
         return newFilm;
     }
 

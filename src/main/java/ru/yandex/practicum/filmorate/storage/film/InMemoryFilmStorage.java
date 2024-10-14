@@ -3,14 +3,15 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.InMemoryDirectorStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +24,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     Map<Long, LinkedHashSet<Long>> filmsGenresIds = new HashMap<>();
     Map<Long, LinkedHashSet<Long>> filmsDirectorsIds = new HashMap<>();
     Map<Long, Long> filmsMpaId = new HashMap<>();
+
+    InMemoryDirectorStorage directorStorage;
+
+    @Autowired
+    public InMemoryFilmStorage(@Lazy InMemoryDirectorStorage directorStorage) {
+        this.directorStorage = directorStorage;
+    }
 
     // вспомогательный метод  генерации идентификатора нового  поста
     private long getNextId() {
@@ -119,20 +127,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLike(Film film, User user) {
-        if (film.getLikes().contains(user.getId())) {
-            throw new DuplicatedDataException(String.format("Пользователь %s уже ставил лайк фильму %s",
-                    user.getName(), film.getName()));
-        }
-
         film.getLikes().add(user.getId());
     }
 
+    @Override
     public LinkedHashSet<Long> getLikes(Long filmId) {
         Film film = films.get(filmId);
         LinkedHashSet<Long> likes = film.getLikes();
 
         if (likes == null || likes.isEmpty()) {
-            log.trace(String.format("У фильма %s нет лайков", film.getName()));
+            log.trace("У фильма {} нет лайков", film.getName());
             return new LinkedHashSet<>();
         }
 
@@ -157,25 +161,45 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addGenreId(Genre genre, Film film) {
-        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(film.getId()));
+    public void addGenreId(Long genreId, Long filmId) {
+        Optional<LinkedHashSet<Long>> filmGenresIds = Optional.ofNullable(filmsGenresIds.get(filmId));
         LinkedHashSet<Long> genresIds = new LinkedHashSet<>();
         if (filmGenresIds.isPresent()) {
             genresIds = filmGenresIds.get();
         }
-        genresIds.add(genre.getId());
-        filmsGenresIds.put(film.getId(), genresIds);
+        genresIds.add(genreId);
+        filmsGenresIds.put(filmId, genresIds);
     }
 
     @Override
-    public void addDirectorId(Director director, Film film) {
-        Optional<LinkedHashSet<Long>> filmDirectorsIds = Optional.ofNullable(filmsDirectorsIds.get(film.getId()));
+    public void addDirectorId(Long directorId, Long filmId) {
+        Optional<LinkedHashSet<Long>> filmDirectorsIds = Optional.ofNullable(filmsDirectorsIds.get(filmId));
         LinkedHashSet<Long> directorsIds = new LinkedHashSet<>();
         if (filmDirectorsIds.isPresent()) {
             directorsIds = filmDirectorsIds.get();
         }
-        directorsIds.add(director.getId());
-        filmsDirectorsIds.put(film.getId(), directorsIds);
+        directorsIds.add(directorId);
+        filmsDirectorsIds.put(filmId, directorsIds);
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId) {
+        return Optional.ofNullable(filmsGenresIds.remove(filmId)).isPresent();
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId) {
+        return Optional.ofNullable(filmsDirectorsIds.remove(filmId)).isPresent();
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId, Long genreId) {
+        return filmsGenresIds.get(filmId).remove(genreId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId, Long directorId) {
+        return filmsDirectorsIds.get(filmId).remove(directorId);
     }
 
     @Override
@@ -215,7 +239,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film update(Film newFilm) {
         films.put(newFilm.getId(), newFilm);
         filmsMpaId.put(newFilm.getId(), newFilm.getMpa().getId());
-        log.trace(String.format("Данные о фильме %s обновлены!", newFilm.getName()));
+        log.trace("Данные о фильме {} обновлены!", newFilm.getName());
         return newFilm;
     }
 
@@ -226,47 +250,33 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        Set<Long> filmsLikedByUser = findUserFilms(userId).stream()
+                .map(Film::getId)
+                .collect(Collectors.toSet());
+
+        Long mostSimilarUserId = findMostSimilarUser(userId, filmsLikedByUser);
+
+        if (mostSimilarUserId == null || filmsLikedByUser.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return getFilmsLikedBySimilarUser(mostSimilarUserId, filmsLikedByUser);
+    }
+
+    @Override
     public Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector) {
         String lowerQuery = query.toLowerCase();
 
         return films.values().stream()
-                .filter(film -> {
-                    boolean matchesTitle = false;
-                    boolean matchesDirector = false;
-
-                    if (byTitle) {
-                        matchesTitle = film.getName().toLowerCase().contains(lowerQuery);
-                    }
-
-                    if (byDirector) {
-                        LinkedHashSet<Long> directorIds = findDirectorsIds(film.getId());
-                        for (Long directorId : directorIds) {
-                            Director director = film.getDirectors().stream()
-                                    .filter(d -> d.getId().equals(directorId))
-                                    .findFirst()
-                                    .orElse(null);
-                            if (director != null && director.getName().toLowerCase().contains(lowerQuery)) {
-                                matchesDirector = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    return matchesTitle || matchesDirector;
-                })
+                .filter(film -> searchFilter(film, lowerQuery, byTitle, byDirector))
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size(), Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 
-    public Collection<Film> getRecommendedFilms(Long userId) {
-        // фильмы, лайкнутые целевым юзером
-        Set<Long> likedFilmsByUser = films.values().stream()
-                .filter(film -> film.getLikes().contains(userId))
-                .map(Film::getId)
-                .collect(Collectors.toSet());
-
-        // юзер с наибольшим кол-вом пересечений
-        Long mostSimilarUserId = films.values().stream()
+    // методы для работы с памятью
+    private Long findMostSimilarUser(Long userId, Set<Long> likedFilmsByUser) {
+        return films.values().stream()
                 .flatMap(film -> film.getLikes().stream())
                 .filter(otherUserId -> !otherUserId.equals(userId))
                 .distinct()
@@ -277,16 +287,45 @@ public class InMemoryFilmStorage implements FilmStorage {
                                         && likedFilmsByUser.contains(film.getId()))
                                 .count()
                 ))
+                .filter(pair -> pair.getValue() > 0)
                 .max(Comparator.comparingLong(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
                 .orElse(null);
+    }
 
-        if (mostSimilarUserId == null) {
-            return Collections.emptyList();
-        }
-
+    private Collection<Film> getFilmsLikedBySimilarUser(Long mostSimilarUserId, Set<Long> likedFilmsByUser) {
         return films.values().stream()
                 .filter(film -> film.getLikes().contains(mostSimilarUserId) && !likedFilmsByUser.contains(film.getId()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean searchFilter(Film film, String lowerQuery, boolean byTitle, boolean byDirector) {
+        boolean matchesTitle = false;
+        boolean matchesDirector = false;
+
+        if (byTitle) {
+            matchesTitle = film.getName().toLowerCase().contains(lowerQuery);
+        }
+
+        if (byDirector) {
+            LinkedHashSet<Long> directorIds = findDirectorsIds(film.getId());
+            for (Long directorId : directorIds) {
+                Director director = film.getDirectors().stream()
+                        .filter(d -> d.getId().equals(directorId))
+                        .findFirst()
+                        .orElse(null);
+                if (director != null
+                        && directorStorage.findDirector(director.getId()).getName().toLowerCase().contains(lowerQuery)) {
+                    matchesDirector = true;
+                    break;
+                }
+            }
+        }
+
+        return matchesTitle || matchesDirector;
+    }
+
+    public void deleteDirectorIdsByDirector(Long directorId) {
+        filmsDirectorsIds.values().forEach(element -> element.remove(directorId));
     }
 }

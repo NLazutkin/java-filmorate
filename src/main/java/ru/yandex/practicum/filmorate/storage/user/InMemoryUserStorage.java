@@ -41,7 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Collection<User> findFriends(Long userId) {
         User user = findUser(userId);
-        log.debug(String.format("Список друзей пользователя %s", user.getName()));
+        log.debug("Список друзей пользователя {}", user.getName());
         Set<Long> friendsIds = user.getFriends();
 
         return friendsIds.stream().map(this::findUser).collect(Collectors.toList());
@@ -67,13 +67,13 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User create(User user) {
         user.setId(getNextId());
-        log.trace(String.format("Данные пользователя %s сохранены!", user.getName()));
+        log.trace("Данные пользователя {} сохранены!", user.getName());
         users.put(user.getId(), user);
         return user;
     }
 
     public User update(User newUser) {
-        log.trace(String.format("Данные пользователя %s обновлены!", newUser.getName()));
+        log.trace("Данные пользователя {} обновлены!", newUser.getName());
         users.put(newUser.getId(), newUser);
         return newUser;
     }
@@ -81,6 +81,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean delete(Long userId) {
         users.remove(userId);
+        users.values().forEach(user -> user.getFriends().remove(userId));
         return Optional.ofNullable(users.get(userId)).isPresent();
     }
 }

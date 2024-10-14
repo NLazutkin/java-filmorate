@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.director;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewDirectorRequest {
-    @NotNull(message = "Имя режиссера не должно быть пустым")
+    @NotBlank(message = "Имя режиссера не должно быть пустым")
     String name;
 }

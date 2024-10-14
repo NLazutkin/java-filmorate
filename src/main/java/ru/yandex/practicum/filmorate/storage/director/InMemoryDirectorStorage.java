@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.storage.director;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,13 +20,11 @@ import java.util.Optional;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InMemoryDirectorStorage implements DirectorStorage {
     Map<Long, Director> directors = new HashMap<>();
+    InMemoryFilmStorage filmStorage;
 
-    public InMemoryDirectorStorage() {
-        directors.put(1L, new Director(1L, "Джордж Лукас"));
-        directors.put(2L, new Director(2L, "Фрэнк Дарабонт"));
-        directors.put(3L, new Director(3L, "Рассел Малкэй"));
-        directors.put(4L, new Director(4L, "Пьер Коффан"));
-        directors.put(5L, new Director(5L, "Крис Рено"));
+    @Autowired
+    public InMemoryDirectorStorage(InMemoryFilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
     }
 
     // вспомогательный метод для генерации идентификатора нового поста
@@ -69,13 +69,14 @@ public class InMemoryDirectorStorage implements DirectorStorage {
     @Override
     public Director update(Director newDirector) {
         directors.put(newDirector.getId(), newDirector);
-        log.trace(String.format("Данные о режиссере %s обновлены!", newDirector.getName()));
+        log.trace("Данные о режиссере {} обновлены!", newDirector.getName());
         return newDirector;
     }
 
     @Override
     public boolean delete(Long directorId) {
         directors.remove(directorId);
+        filmStorage.deleteDirectorIdsByDirector(directorId);
         return Optional.ofNullable(directors.get(directorId)).isPresent();
     }
 }

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Feed;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class InMemoryFeedStorage implements FeedStorage {
     public Collection<Feed> getEventsByUserId(Long userId) {
         return feeds.stream()
                 .filter(feed -> feed.getUserId().equals(userId))
-                .sorted((f1, f2) -> Long.compare(f1.getTimestamp(), f2.getTimestamp()))
+                .sorted(Comparator.comparingLong(Feed::getTimestamp))
                 .collect(Collectors.toList());
     }
 }
