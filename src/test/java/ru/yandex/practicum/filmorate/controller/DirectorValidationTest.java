@@ -42,4 +42,15 @@ public class DirectorValidationTest {
         assertEquals(1, violations.size());
         assertFalse(violations.isEmpty(), "Ошибка валидации при заполнении класса Director пустыми данными");
     }
+
+    @Test
+    void setDirectorWithSpaceInsteadOfName() {
+        director.setId(1L);
+        director.setName(" ");
+
+        Set<ConstraintViolation<Director>> violations = validator.validate(director);
+
+        assertEquals(1, violations.size());
+        assertFalse(violations.isEmpty(), "Ошибка валидации при заполнении класса Director пустыми данными");
+    }
 }

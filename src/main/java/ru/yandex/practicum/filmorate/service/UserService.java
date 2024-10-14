@@ -37,8 +37,9 @@ public class UserService {
 
     @Autowired
     public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage,
-                       @Qualifier("FilmDbStorage") FilmStorage filmStorage, FilmService filmService,
-                       @Qualifier("FeedDbStorage") FeedStorage feedStorage) {
+                       @Qualifier(/*"InMemoryFilmStorage"*/"FilmDbStorage") FilmStorage filmStorage,
+                       @Qualifier(/*"InMemoryFeedStorage"*/"FeedDbStorage") FeedStorage feedStorage,
+                       FilmService filmService) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
         this.filmService = filmService;

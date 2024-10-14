@@ -16,10 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 
-import java.util.Collection;
-
-import java.util.LinkedHashSet;
-import java.util.Objects;
+import java.util.*;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -141,15 +138,7 @@ class FilmStorageTest {
                 .hasSize(4)
                 .containsOnly(1L, 3L, 4L, 6L);
 
-        Film film = new Film();
-        film.setId(4L);
-        film.setName("Гадкий я");
-
-        Genre genre = new Genre();
-        genre.setId(2L);
-        genre.setName("Драма");
-
-        filmStorage.addGenreId(genre.getId(), film.getId());
+        filmStorage.addGenreId(2L, 4L);
 
         assertThat(filmStorage.findGenresIds(4L))
                 .isNotEmpty()
@@ -189,6 +178,7 @@ class FilmStorageTest {
         newFilm.setDescription("Гадкий снаружи, но добрый внутри Грю намерен, тем не менее, ...");
         newFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         newFilm.setDuration(95L);
+        newFilm.setMpa(new Mpa());
 
         assertThat(filmStorage.update(newFilm))
                 .isNotNull()
@@ -297,5 +287,123 @@ class FilmStorageTest {
                 .allMatch(film -> film.getReleaseDate().getYear() == 2010)
                 .allMatch(film -> film.getGenres().stream()
                         .allMatch(genre -> Objects.equals(genre.getId(), genreId)));
+    }
+
+    @Test
+    public void testFindDirectorFilms() {
+        assertThat(filmStorage.findDirectorFilms(1L))
+                .isNotEmpty()
+                .isInstanceOf(Collection.class)
+                .hasSize(2)
+                .extracting(Film::getName)
+                .containsOnly("Тень", "Звёздные войны: Эпизод 4 – Новая надежда");
+    }
+
+    @Test
+    public void testFindDirectorFilmsOrderYear() {
+        assertThat(filmStorage.findDirectorFilmsOrderYear(1L))
+                .isNotEmpty()
+                .isInstanceOf(Collection.class)
+                .hasSize(2)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Тень");
+    }
+
+    @Test
+    public void testFindDirectorFilmsOrderLikes() {
+        assertThat(filmStorage.findDirectorFilmsOrderLikes(1L))
+                .isNotEmpty()
+                .isInstanceOf(Collection.class)
+                .hasSize(2)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 2L)
+                .hasFieldOrPropertyWithValue("name", "Звёздные войны: Эпизод 4 – Новая надежда");
+    }
+
+    @Test
+    public void testAddDirectorId() {
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(2);
+
+        filmStorage.addDirectorId(2L, 4L);
+
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(3)
+                .containsOnly(2L, 4L, 5L);
+    }
+
+    @Test
+    public void testFindDirectorIds() {
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(2)
+                .containsOnly(4L, 5L);
+    }
+
+    @Test
+    public void testDeleteAllGenreIds() {
+        filmStorage.deleteGenreIds(4L);
+
+        assertThat(filmStorage.findGenresIds(4L))
+                .isEmpty();
+    }
+
+    @Test
+    public void testDeleteAllDirectorIds() {
+        filmStorage.deleteDirectorIds(4L);
+
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isEmpty();
+    }
+
+    @Test
+    public void testDeleteGenreIds() {
+        assertThat(filmStorage.findGenresIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(4)
+                .containsOnly(1L, 3L, 4L, 6L);
+
+        filmStorage.deleteGenreIds(4L, 6L);
+
+        assertThat(filmStorage.findGenresIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(3)
+                .containsOnly(1L, 3L, 4L);
+    }
+
+    @Test
+    public void testDeleteDirectorIds() {
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(2)
+                .containsOnly(4L, 5L);
+
+        filmStorage.deleteDirectorIds(4L, 5L);
+
+        assertThat(filmStorage.findDirectorsIds(4L))
+                .isNotEmpty()
+                .isInstanceOf(LinkedHashSet.class)
+                .hasSize(1)
+                .containsOnly(4L);
+    }
+
+    @Test
+    public void testSearchFilms() {
+        assertThat(filmStorage.searchFilms("%ен%", true, false))
+                .isNotEmpty()
+                .isInstanceOf(Collection.class)
+                .hasSize(2)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Тень");
     }
 }

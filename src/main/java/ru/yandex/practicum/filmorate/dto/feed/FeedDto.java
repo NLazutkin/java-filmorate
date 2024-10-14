@@ -13,9 +13,11 @@ import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 public class FeedDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Long eventId;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Long userId;
     Long timestamp;
     EventType eventType;
     OperationType operation;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Long entityId;
 }

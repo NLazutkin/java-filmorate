@@ -64,6 +64,6 @@ public class DirectorStorageTest {
 
     @Test
     public void delete() {
-        assertThat(directorStorage.delete(5L)).isFalse();
+        assertThat(directorStorage.delete(5L)).isTrue();
     }
 }
