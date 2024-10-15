@@ -12,13 +12,17 @@ import ru.yandex.practicum.filmorate.enums.query.FilmQueries;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.film.FilmBaseRowMapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("FilmDbStorage")
@@ -45,7 +49,37 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> findPopular(Integer count) {
-        return findMany(FilmQueries.FIND_POPULAR_QUERY.toString(), baseMapper);
+        return findMany(FilmQueries.FIND_POPULAR_QUERY.toString(), baseMapper, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByYear(Integer count, Integer year) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_YEAR_QUERY.toString(), baseMapper, year, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenre(Integer count, Long genreId) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_GENRE_QUERY.toString(), baseMapper, genreId, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenreAndYear(Integer count, Long genreId, Integer year) {
+        return findMany(FilmQueries.FIND_POPULAR_BY_GENRE_AND_YEAR_QUERY.toString(), baseMapper, genreId, year, count);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilms(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_QUERY.toString(), baseMapper, directorId);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderYear(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_ORDER_YEAR_QUERY.toString(), baseMapper, directorId);
+    }
+
+    @Override
+    public Collection<Film> findDirectorFilmsOrderLikes(Long directorId) {
+        return findMany(FilmQueries.FIND_DIRECTOR_FILMS_ORDER_LIKES_QUERY.toString(), baseMapper, directorId);
     }
 
     @Override
@@ -76,15 +110,47 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public void addGenreId(Genre genre, Film film) {
-        String errMsg = String.format("Для фильма %s не удалось установить жанр %s", film.getName(), genre.getName());
+    public void addGenreId(Long genreId, Long filmId) {
+        String errMsg = String.format("Для фильма с ID%d не удалось установить жанр с ID%d", filmId, genreId);
 
         try {
-            update(FilmQueries.INSERT_FILM_GENRE_QUERY.toString(), errMsg, film.getId(), genre.getId());
+            update(FilmQueries.INSERT_FILM_GENRE_QUERY.toString(), errMsg, filmId, genreId);
         } catch (SQLWarningException e) {
-            throw new DuplicatedDataException(String.format("Для фильма %s жанр %s уже установлен. %s",
-                    film.getName(), genre.getName(), e.getSQLWarning()));
+            throw new DuplicatedDataException(String.format("Для фильма с ID%d жанр с ID%d уже установлен. %s",
+                    filmId, genreId, e.getSQLWarning()));
         }
+    }
+
+    @Override
+    public void addDirectorId(Long directorId, Long filmId) {
+        String errMsg = String.format("Для фильма с ID%d не удалось установить режиссера с ID %d", filmId, directorId);
+
+        try {
+            update(FilmQueries.INSERT_FILM_DIRECTOR_QUERY.toString(), errMsg, filmId, directorId);
+        } catch (SQLWarningException e) {
+            throw new DuplicatedDataException(String.format("Для фильма с ID%d режиссер с ID%d уже установлен. %s",
+                    filmId, directorId, e.getSQLWarning()));
+        }
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId) {
+        return delete(FilmQueries.DELETE_FILM_GENRE_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public boolean deleteGenreIds(Long filmId, Long genreId) {
+        return delete(FilmQueries.DELETE_FILM_GENRE_BY_IDS_QUERY.toString(), filmId, genreId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId) {
+        return delete(FilmQueries.DELETE_FILM_DIRECTOR_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public boolean deleteDirectorIds(Long filmId, Long directorId) {
+        return delete(FilmQueries.DELETE_FILM_DIRECTOR_BY_IDS_QUERY.toString(), filmId, directorId);
     }
 
     @Override
@@ -99,6 +165,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
+    public LinkedHashSet<Long> findDirectorsIds(Long filmId) {
+        return new LinkedHashSet<>(jdbc.query(FilmQueries.FIND_DIRECTOR_ID_QUERY.toString(),
+                (rs, rowNum) -> rs.getLong("director_id"), filmId));
+    }
+
+    @Override
     public Film create(Film film) {
         long id = insert(FilmQueries.INSERT_FILM_QUERY.toString(), film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
@@ -109,12 +181,93 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Film update(Film newFilm) {
         update(FilmQueries.UPDATE_QUERY.toString(), "Не удалось обновить данные фильма", newFilm.getName(),
-                newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getId());
+                newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
         return newFilm;
     }
 
     @Override
     public boolean delete(Long filmId) {
         return delete(FilmQueries.DELETE_QUERY.toString(), filmId);
+    }
+
+    @Override
+    public Collection<Film> searchFilms(String query, boolean byTitle, boolean byDirector) {
+        String lowerQuery = "%" + query.toLowerCase() + "%";
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT f.*, COUNT(l.user_id) AS popularity " +
+                        "FROM films f " +
+                        "LEFT JOIN likes l ON f.id = l.film_id "
+        );
+
+        if (byDirector) {
+            sql.append(
+                    "LEFT JOIN films_directors fd ON f.id = fd.film_id " +
+                            "LEFT JOIN directors d ON fd.director_id = d.id "
+            );
+        }
+
+        sql.append("WHERE ");
+
+        if (byTitle && byDirector) {
+            sql.append("(LOWER(f.name) LIKE ? OR LOWER(d.name) LIKE ?) ");
+            params.add(lowerQuery);
+            params.add(lowerQuery);
+        } else if (byTitle) {
+            sql.append("LOWER(f.name) LIKE ? ");
+            params.add(lowerQuery);
+        } else if (byDirector) {
+            sql.append("LOWER(d.name) LIKE ? ");
+            params.add(lowerQuery);
+        } else {
+            sql.append("LOWER(f.name) LIKE ? ");
+            params.add(lowerQuery);
+        }
+
+        sql.append(
+                "GROUP BY f.id " +
+                        "ORDER BY popularity DESC"
+        );
+
+        String finalSql = sql.toString();
+        log.debug("SQL запрос для поиска фильмов: {}", finalSql);
+
+        return findMany(finalSql, baseMapper, params.toArray());
+    }
+
+    public Collection<Film> findUserFilms(Long userId) {
+        return findMany(FilmQueries.FIND_USER_FILMS_QUERY.toString(), baseMapper, userId);
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        Collection<Long> likedFilms = getFilmsLikedByUser(userId);
+        Long similarUser = findMostSimilarUser(userId, likedFilms);
+
+        if (similarUser == null) {
+            return Collections.emptyList();
+        }
+
+        Collection<Long> recommendedFilmsIds = getFilmsLikedByUser(similarUser);
+        recommendedFilmsIds.removeAll(likedFilms);
+
+        return recommendedFilmsIds.stream()
+                .map(this::findFilm)
+                .collect(Collectors.toList());
+    }
+
+    private Collection<Long> getFilmsLikedByUser(Long userId) {
+        return new HashSet<>(jdbc.queryForList(FilmQueries.FIND_LIKED_FILMS_BY_USER_ID_QUERY.toString(),
+                Long.class, userId));
+    }
+
+    private Long findMostSimilarUser(Long userId, Collection<Long> filmsLikedByUser) {
+        return jdbc.query(FilmQueries.FIND_MOST_SIMILAR_USER.toString(), rs -> {
+            if (rs.next()) {
+                return rs.getLong("user_id");
+            } else {
+                return null;
+            }
+        }, userId, userId);
     }
 }

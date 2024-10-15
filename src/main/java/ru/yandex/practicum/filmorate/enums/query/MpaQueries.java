@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum MpaQueries {
     FIND_ALL_QUERY("SELECT * FROM ratings"),
 
@@ -13,7 +17,7 @@ public enum MpaQueries {
 
     DELETE_QUERY("DELETE FROM ratings WHERE id = ?");
 
-    private final String query;
+    String query;
 
     MpaQueries(String query) {
         this.query = query;

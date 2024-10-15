@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.enums.query;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum  GenreQueries {
     FIND_ALL_QUERY("SELECT * FROM genres"),
 
@@ -13,7 +17,7 @@ public enum  GenreQueries {
 
     DELETE_QUERY("DELETE FROM genres WHERE id = ?");
 
-    private final String query;
+    String query;
 
     GenreQueries(String query) {
         this.query = query;

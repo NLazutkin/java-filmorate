@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Mpa {
-    private Long id;
+    Long id;
     @NotNull(message = "Название рейтинга не должно быть пустым")
-    private String name;
-    private String description;
+    String name;
+    String description;
 }

@@ -7,13 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.Pair;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
+import ru.yandex.practicum.filmorate.enums.actions.EventType;
+import ru.yandex.practicum.filmorate.enums.actions.OperationType;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -24,10 +31,19 @@ import java.util.stream.Collectors;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService {
     UserStorage userStorage;
+    FilmStorage filmStorage;
+    FilmService filmService;
+    FeedStorage feedStorage;
 
     @Autowired
-    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier(/*"InMemoryUserStorage"*/"UserDbStorage") UserStorage userStorage,
+                       @Qualifier(/*"InMemoryFilmStorage"*/"FilmDbStorage") FilmStorage filmStorage,
+                       @Qualifier(/*"InMemoryFeedStorage"*/"FeedDbStorage") FeedStorage feedStorage,
+                       FilmService filmService) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+        this.filmService = filmService;
+        this.feedStorage = feedStorage;
     }
 
     public UserDto findUser(Long userId) {
@@ -37,13 +53,31 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.addFriend(userId, friendId);
 
-        log.debug(String.format("Добавляем %s в список друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Добавляем {} в список друзей {}", names.getSecond(), names.getFirst());
+
+        Feed feed = new Feed();
+        feed.setUserId(userId);
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.FRIEND);
+        feed.setOperation(OperationType.ADD);
+        feed.setEntityId(friendId);
+
+        feedStorage.addEvent(feed);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         Pair<String, String> names = userStorage.deleteFriend(userId, friendId);
 
-        log.debug(String.format("Удаляем %s из списка друзей %s", names.getSecond(), names.getFirst()));
+        log.debug("Удаляем {} из списка друзей {}", names.getSecond(), names.getFirst());
+
+        Feed feed = new Feed();
+        feed.setUserId(userId);
+        feed.setTimestamp(System.currentTimeMillis());
+        feed.setEventType(EventType.FRIEND);
+        feed.setOperation(OperationType.REMOVE);
+        feed.setEntityId(friendId);
+
+        feedStorage.addEvent(feed);
     }
 
     public Collection<UserDto> findFriends(Long userId) {
@@ -104,7 +138,23 @@ public class UserService {
 
     public boolean delete(Long filmId) {
         User user = userStorage.findUser(filmId);
-        log.debug(String.format("Удаляем данные пользователя %s", user.getName()));
+        log.debug("Удаляем данные пользователя {}", user.getName());
         return userStorage.delete(filmId);
+    }
+
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        User user = userStorage.findUser(userId);
+        log.debug("Запрашиваем рекомендации фильмов для пользователя {}", userId);
+        Collection<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId);
+
+        if (recommendedFilms.isEmpty()) {
+            log.debug("Для пользователя {} не найдено рекомендаций", userId);
+            return Collections.EMPTY_LIST;
+        } else {
+            log.debug("Для пользователя {} составлен список из {} фильмов(-a)", userId, recommendedFilms.size());
+            return recommendedFilms.stream()
+                    .map(filmService::fillFilmData)
+                    .collect(Collectors.toList());
+        }
     }
 }
